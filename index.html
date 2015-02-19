@@ -1,0 +1,615 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Datatablejs by mkenney</title>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="javascripts/respond.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <!--[if lt IE 8]>
+    <link rel="stylesheet" href="stylesheets/ie.css">
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+  </head>
+  <body>
+      <div id="header">
+        <nav>
+          <li class="fork"><a href="https://github.com/mkenney/DatatableJs">View On GitHub</a></li>
+          <li class="downloads"><a href="https://github.com/mkenney/DatatableJs/zipball/master">ZIP</a></li>
+          <li class="downloads"><a href="https://github.com/mkenney/DatatableJs/tarball/master">TAR</a></li>
+          <li class="title">DOWNLOADS</li>
+        </nav>
+      </div><!-- end header -->
+
+    <div class="wrapper">
+
+      <section>
+        <div id="title">
+          <h1>Datatablejs</h1>
+          <p>A library for manipulating and filtering tabular data</p>
+          <hr>
+          <span class="credits left">Project maintained by <a href="https://github.com/mkenney">mkenney</a></span>
+          <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></span>
+        </div>
+
+        <h1>
+<a id="datatablejs" class="anchor" href="#datatablejs" aria-hidden="true"><span class="octicon octicon-link"></span></a><a href="https://github.com/mkenney/DatatableJs">DatatableJs</a>
+</h1>
+
+<p>DatatableJs is a library for manipulating and filtering tabular data.  I use this
+a lot in various UIs and have found many convenient ways to use this to manipulate
+interface elements as well as tabular data.</p>
+
+<p>This implements a stable sort hack to allow for multi-column sort operations using
+the native sorting algorithm, I did not implement a sort in the code.  Instead, I
+create and position flag on the row objects.  As a result, <code>__pos__</code> is a reserved
+field name and will be overwritten if you use it.</p>
+
+<h2>
+<a id="table-of-contents" class="anchor" href="#table-of-contents" aria-hidden="true"><span class="octicon octicon-link"></span></a>Table of contents</h2>
+
+<ul>
+<li><a href="#quick-start">Quick start</a></li>
+<li><a href="#bugs-and-feature-requests">Bugs and feature requests</a></li>
+<li><a href="#documentation">Documentation</a></li>
+<li><a href="#contributing">Contributing</a></li>
+<li><a href="#versioning">Versioning</a></li>
+<li><a href="#creator">Creator</a></li>
+<li><a href="#copyright-and-license">Copyright and license</a></li>
+</ul>
+
+<h2>
+<a id="quick-start" class="anchor" href="#quick-start" aria-hidden="true"><span class="octicon octicon-link"></span></a>Quick start</h2>
+
+<ul>
+<li>Clone the repo: <code>git clone https://github.com/mkenney/DatatableJs.git</code>.</li>
+</ul>
+
+<h3>
+<a id="whats-included" class="anchor" href="#whats-included" aria-hidden="true"><span class="octicon octicon-link"></span></a>What's included</h3>
+
+<p>Within the repository you'll find a directory and file structure similar to this:</p>
+
+<pre><code>DatatableJs/
+    │
+    ├── src/
+    │   └──js/
+    │       ├── Column.js
+    │       ├── Data.js
+    │       ├── DatatableJs.js
+    │       ├── Exception.js
+    │       ├── Filter.js
+    │       └── Schema.js
+    │
+    └── assets/
+        └──js/
+            ├── DatatableJs.js
+            ├── DatatableJs.map
+            └── DatatableJs.min.js
+</code></pre>
+
+<p>The compiled file (<code>DatatableJs.js</code>) and <a href="https://developers.google.com/chrome-developer-tools/docs/css-preprocessors">source map</a>
+(<code>DatatableJs.map</code>) are located in the assets/ directory and are available for use
+with certain browsers' developer tools.</p>
+
+<h2>
+<a id="bugs-and-feature-requests" class="anchor" href="#bugs-and-feature-requests" aria-hidden="true"><span class="octicon octicon-link"></span></a>Bugs and feature requests</h2>
+
+<p>If you find a bug or have a feature request <a href="#contributing">please open a new issue</a>.</p>
+
+<h2>
+<a id="documentation" class="anchor" href="#documentation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Documentation</h2>
+
+<p>DatatableJs creates a new global object <code>DatatableJs</code>.</p>
+
+<p>The following examples will reference this schema and data set:</p>
+
+<div class="highlight highlight-javascript"><pre><span class="pl-c">// The schema defines requirements and default options for a data property.  When</span>
+<span class="pl-c">// a schema us used, the datatable will reject any object that has a property that</span>
+<span class="pl-c">// doesn't conform to the requirements it defines.</span>
+<span class="pl-c">//</span>
+<span class="pl-c">// A schema can be applied at any time, even after data has been imported.</span>
+<span class="pl-c">// Non-conforming rows will be removed from the data set when it is applied</span>
+<span class="pl-s">var</span> sample_schema <span class="pl-k">=</span> {
+
+    <span class="pl-c">// The key identifies a property expected in the data set</span>
+    id<span class="pl-k">:</span> {
+
+        <span class="pl-c">// Optional</span>
+        <span class="pl-c">//</span>
+        <span class="pl-c">// Strings or function references for native types:</span>
+        <span class="pl-c">//     'Number' or Number to require numbers for example.  Does smart</span>
+        <span class="pl-c">//     type checking so in this case 1 or Number(1) or new Number(1) would</span>
+        <span class="pl-c">//     qualify but NaN would not</span>
+        <span class="pl-c">//</span>
+        <span class="pl-c">// Functions or even instances for custom objects</span>
+        <span class="pl-c">//     DatatableJs for example</span>
+        type<span class="pl-k">:</span> <span class="pl-s3">Number</span>
+
+        <span class="pl-c">// Optional, Boolean, default true.</span>
+        <span class="pl-c">//</span>
+        <span class="pl-c">// If true or omitted allow null, undefined and omitted values. If false,</span>
+        <span class="pl-c">// reject rows containing null, undefined or omitted values for this</span>
+        <span class="pl-c">// property.</span>
+        , nullable<span class="pl-k">:</span> <span class="pl-c1">false</span>
+
+        <span class="pl-c">// Optional, default custom comparator function to use when sorting this</span>
+        <span class="pl-c">// column.  This value is not used if a comparitor function is defined</span>
+        <span class="pl-c">// when calling addSortRule() on a filter instance.</span>
+        , sort_comparator<span class="pl-k">:</span> <span class="pl-c1">undefined</span>
+
+        <span class="pl-c">// Optional, default data transformer function to use when before sorting</span>
+        <span class="pl-c">// the data in this column.  This value is not used if a transformer</span>
+        <span class="pl-c">// function is defined when calling addSortRule() on a filter instance.</span>
+        , sort_transformer<span class="pl-k">:</span> <span class="pl-c1">undefined</span>
+
+        <span class="pl-c">// Optional, default sort direction for this column.  This value is not</span>
+        <span class="pl-c">// used if a sort_direction defined when calling addSortRule() on a</span>
+        <span class="pl-c">// filter instance.</span>
+        , sort_direction<span class="pl-k">:</span>   <span class="pl-s1"><span class="pl-pds">'</span>desc<span class="pl-pds">'</span></span>
+    }
+    , col1<span class="pl-k">:</span> {
+        sort_direction<span class="pl-k">:</span> <span class="pl-s1"><span class="pl-pds">'</span>asc<span class="pl-pds">'</span></span>
+    }
+    , col1<span class="pl-k">:</span> {
+        nullable<span class="pl-k">:</span> <span class="pl-c1">true</span>
+        , sort_direction<span class="pl-k">:</span> <span class="pl-s1"><span class="pl-pds">'</span>asc<span class="pl-pds">'</span></span>
+    }
+}
+
+
+<span class="pl-c">// Data can be any array of objects</span>
+<span class="pl-s">var</span> sample_data <span class="pl-k">=</span> [
+    { id<span class="pl-k">:</span> <span class="pl-c1">undefined</span>,  col1<span class="pl-k">:</span> <span class="pl-c1">0</span>,   col2<span class="pl-k">:</span> <span class="pl-c1">0</span> },
+    { id<span class="pl-k">:</span> <span class="pl-c1">null</span>,       col1<span class="pl-k">:</span> <span class="pl-c1">1</span>,   col2<span class="pl-k">:</span> <span class="pl-c1">1</span> },
+    { id<span class="pl-k">:</span> <span class="pl-s1"><span class="pl-pds">'</span>3<span class="pl-pds">'</span></span>,        col1<span class="pl-k">:</span> <span class="pl-c1">2</span>,   col2<span class="pl-k">:</span> <span class="pl-c1">0</span> },
+    { id<span class="pl-k">:</span> <span class="pl-c1">4</span>,          col1<span class="pl-k">:</span> <span class="pl-c1">0</span>,   col2<span class="pl-k">:</span> <span class="pl-c1">undefined</span> },
+    { id<span class="pl-k">:</span> <span class="pl-c1">5</span>,          col1<span class="pl-k">:</span> <span class="pl-c1">1</span>,   col2<span class="pl-k">:</span> <span class="pl-c1">null</span> },
+    { id<span class="pl-k">:</span> <span class="pl-c1">6</span>,          col1<span class="pl-k">:</span> <span class="pl-c1">2</span>,   col2<span class="pl-k">:</span> <span class="pl-c1">1</span> },
+    { id<span class="pl-k">:</span> <span class="pl-c1">7</span>,          col1<span class="pl-k">:</span> <span class="pl-s1"><span class="pl-pds">'</span>0<span class="pl-pds">'</span></span>, col2<span class="pl-k">:</span> <span class="pl-c1">0</span> },
+    { id<span class="pl-k">:</span> <span class="pl-c1">8</span>,          col1<span class="pl-k">:</span> <span class="pl-s1"><span class="pl-pds">'</span>1<span class="pl-pds">'</span></span>, col2<span class="pl-k">:</span> <span class="pl-c1">1</span> },
+    { id<span class="pl-k">:</span> <span class="pl-c1">9</span>,          col1<span class="pl-k">:</span> <span class="pl-s1"><span class="pl-pds">'</span>2<span class="pl-pds">'</span></span>, col2<span class="pl-k">:</span> <span class="pl-c1">0</span> },
+
+    { id<span class="pl-k">:</span> <span class="pl-c1">11</span>,         col1<span class="pl-k">:</span> <span class="pl-c1">0</span>,   col2<span class="pl-k">:</span> <span class="pl-c1">0</span> },
+    { id<span class="pl-k">:</span> <span class="pl-c1">12</span>,         col1<span class="pl-k">:</span> <span class="pl-c1">1</span>,   col2<span class="pl-k">:</span> <span class="pl-c1">1</span> },
+    { id<span class="pl-k">:</span> <span class="pl-c1">13</span>,         col1<span class="pl-k">:</span> <span class="pl-c1">2</span>,   col2<span class="pl-k">:</span> <span class="pl-c1">0</span> },
+    { id<span class="pl-k">:</span> <span class="pl-c1">14</span>,         col1<span class="pl-k">:</span> <span class="pl-c1">0</span>,   col2<span class="pl-k">:</span> <span class="pl-c1">1</span> },
+    { id<span class="pl-k">:</span> <span class="pl-c1">15</span>,         col1<span class="pl-k">:</span> <span class="pl-c1">1</span>,   col2<span class="pl-k">:</span> <span class="pl-c1">0</span> },
+    { id<span class="pl-k">:</span> <span class="pl-c1">16</span>,         col1<span class="pl-k">:</span> <span class="pl-c1">2</span>,   col2<span class="pl-k">:</span> <span class="pl-c1">1</span> },
+    { id<span class="pl-k">:</span> <span class="pl-c1">17</span>,         col1<span class="pl-k">:</span> <span class="pl-c1">0</span>,   col2<span class="pl-k">:</span> <span class="pl-c1">0</span> },
+    { id<span class="pl-k">:</span> <span class="pl-c1">18</span>,         col1<span class="pl-k">:</span> <span class="pl-c1">1</span>,   col2<span class="pl-k">:</span> <span class="pl-c1">1</span> },
+    { id<span class="pl-k">:</span> <span class="pl-c1">19</span>,         col1<span class="pl-k">:</span> <span class="pl-c1">2</span>,   col2<span class="pl-k">:</span> <span class="pl-c1">0</span> },
+
+    { id<span class="pl-k">:</span> <span class="pl-c1">21</span>,         col1<span class="pl-k">:</span> <span class="pl-c1">0</span>,   col2<span class="pl-k">:</span> <span class="pl-c1">0</span> },
+    { id<span class="pl-k">:</span> <span class="pl-c1">22</span>,         col1<span class="pl-k">:</span> <span class="pl-c1">1</span>,   col2<span class="pl-k">:</span> <span class="pl-c1">1</span> },
+    { id<span class="pl-k">:</span> <span class="pl-c1">23</span>,         col1<span class="pl-k">:</span> <span class="pl-c1">2</span>,   col2<span class="pl-k">:</span> <span class="pl-c1">0</span> },
+    { id<span class="pl-k">:</span> <span class="pl-c1">24</span>,         col1<span class="pl-k">:</span> <span class="pl-c1">0</span>,   col2<span class="pl-k">:</span> <span class="pl-c1">1</span> },
+    { id<span class="pl-k">:</span> <span class="pl-c1">25</span>,         col1<span class="pl-k">:</span> <span class="pl-c1">1</span>,   col2<span class="pl-k">:</span> <span class="pl-c1">0</span> },
+    { id<span class="pl-k">:</span> <span class="pl-c1">26</span>,         col1<span class="pl-k">:</span> <span class="pl-c1">2</span>,   col2<span class="pl-k">:</span> <span class="pl-c1">1</span> },
+    { id<span class="pl-k">:</span> <span class="pl-c1">27</span>,         col1<span class="pl-k">:</span> <span class="pl-c1">0</span>,   col2<span class="pl-k">:</span> <span class="pl-c1">0</span> },
+    { id<span class="pl-k">:</span> <span class="pl-c1">28</span>,         col1<span class="pl-k">:</span> <span class="pl-c1">1</span>,   col2<span class="pl-k">:</span> <span class="pl-c1">1</span> },
+    { id<span class="pl-k">:</span> <span class="pl-c1">29</span>,         col1<span class="pl-k">:</span> <span class="pl-c1">2</span>,   col2<span class="pl-k">:</span> <span class="pl-c1">0</span> }
+];</pre></div>
+
+<p>Example 1: Loop through the data</p>
+
+<div class="highlight highlight-javascript"><pre><span class="pl-s">var</span> datatable <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-en">DatatableJs</span>({data<span class="pl-k">:</span> sample_data});
+<span class="pl-s">var</span> filter <span class="pl-k">=</span> datatable.createFilter();
+<span class="pl-s">var</span> row;
+<span class="pl-k">while</span> (row <span class="pl-k">=</span> filter.<span class="pl-sc">next</span>()) {
+    <span class="pl-en">console</span><span class="pl-s3">.log</span>(row.<span class="pl-sc">id</span>, row.col1, row.col2);
+}
+
+<span class="pl-c">// OUTPUT:</span>
+<span class="pl-c1">undefined</span> <span class="pl-c1">0</span> <span class="pl-c1">0</span>
+<span class="pl-c1">null</span> <span class="pl-c1">1</span> <span class="pl-c1">1</span>
+<span class="pl-c1">3</span> <span class="pl-c1">2</span> <span class="pl-c1">0</span>
+<span class="pl-c1">4</span> <span class="pl-c1">0</span> <span class="pl-c1">undefined</span>
+<span class="pl-c1">5</span> <span class="pl-c1">1</span> <span class="pl-c1">null</span>
+<span class="pl-c1">6</span> <span class="pl-c1">2</span> <span class="pl-c1">1</span>
+<span class="pl-c1">7</span> <span class="pl-s1"><span class="pl-pds">"</span>0<span class="pl-pds">"</span></span> <span class="pl-c1">0</span>
+<span class="pl-c1">8</span> <span class="pl-s1"><span class="pl-pds">"</span>1<span class="pl-pds">"</span></span> <span class="pl-c1">1</span>
+<span class="pl-c1">9</span> <span class="pl-s1"><span class="pl-pds">"</span>2<span class="pl-pds">"</span></span> <span class="pl-c1">0</span>
+<span class="pl-c1">11</span> <span class="pl-c1">0</span> <span class="pl-c1">0</span>
+<span class="pl-c1">12</span> <span class="pl-c1">1</span> <span class="pl-c1">1</span>
+<span class="pl-c1">13</span> <span class="pl-c1">2</span> <span class="pl-c1">0</span>
+<span class="pl-c1">14</span> <span class="pl-c1">0</span> <span class="pl-c1">1</span>
+<span class="pl-c1">15</span> <span class="pl-c1">1</span> <span class="pl-c1">0</span>
+<span class="pl-c1">16</span> <span class="pl-c1">2</span> <span class="pl-c1">1</span>
+<span class="pl-c1">17</span> <span class="pl-c1">0</span> <span class="pl-c1">0</span>
+<span class="pl-c1">18</span> <span class="pl-c1">1</span> <span class="pl-c1">1</span>
+<span class="pl-c1">19</span> <span class="pl-c1">2</span> <span class="pl-c1">0</span>
+<span class="pl-c1">21</span> <span class="pl-c1">0</span> <span class="pl-c1">0</span>
+<span class="pl-c1">22</span> <span class="pl-c1">1</span> <span class="pl-c1">1</span>
+<span class="pl-c1">23</span> <span class="pl-c1">2</span> <span class="pl-c1">0</span>
+<span class="pl-c1">24</span> <span class="pl-c1">0</span> <span class="pl-c1">1</span>
+<span class="pl-c1">25</span> <span class="pl-c1">1</span> <span class="pl-c1">0</span>
+<span class="pl-c1">26</span> <span class="pl-c1">2</span> <span class="pl-c1">1</span>
+<span class="pl-c1">27</span> <span class="pl-c1">0</span> <span class="pl-c1">0</span>
+<span class="pl-c1">28</span> <span class="pl-c1">1</span> <span class="pl-c1">1</span>
+<span class="pl-c1">29</span> <span class="pl-c1">2</span> <span class="pl-c1">0</span></pre></div>
+
+<p>Example 2: Apply a data schema</p>
+
+<div class="highlight highlight-javascript"><pre><span class="pl-s">var</span> datatable <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-en">DatatableJs</span>({
+    schema<span class="pl-k">:</span> sample_schema,
+    data<span class="pl-k">:</span> sample_data
+});
+<span class="pl-s">var</span> filter <span class="pl-k">=</span> datatable.createFilter();
+<span class="pl-s">var</span> row;
+<span class="pl-k">while</span> (row <span class="pl-k">=</span> filter.<span class="pl-sc">next</span>()) {
+    <span class="pl-en">console</span><span class="pl-s3">.log</span>(row.<span class="pl-sc">id</span>, row.col1, row.col2);
+}
+
+<span class="pl-c">// OUTPUT:</span>
+DatatableJs <span class="pl-k">-</span> Could not <span class="pl-k">import</span> row<span class="pl-k">:</span> <span class="pl-s1"><span class="pl-pds">"</span>id<span class="pl-pds">"</span></span> value is invalid <span class="pl-c1">undefined</span> <span class="pl-s3">Object</span> {type<span class="pl-k">:</span> <span class="pl-st">function</span>, nullable<span class="pl-k">:</span> <span class="pl-c1">false</span>, sort_comparator<span class="pl-k">:</span> <span class="pl-c1">undefined</span>, sort_transformer<span class="pl-k">:</span> <span class="pl-c1">undefined</span>, sort_direction<span class="pl-k">:</span> <span class="pl-s1"><span class="pl-pds">"</span>desc<span class="pl-pds">"</span></span>}
+
+DatatableJs <span class="pl-k">-</span> Could not <span class="pl-k">import</span> row<span class="pl-k">:</span> <span class="pl-s1"><span class="pl-pds">"</span>id<span class="pl-pds">"</span></span> value is invalid <span class="pl-c1">null</span> <span class="pl-s3">Object</span> {type<span class="pl-k">:</span> <span class="pl-st">function</span>, nullable<span class="pl-k">:</span> <span class="pl-c1">false</span>, sort_comparator<span class="pl-k">:</span> <span class="pl-c1">undefined</span>, sort_transformer<span class="pl-k">:</span> <span class="pl-c1">undefined</span>, sort_direction<span class="pl-k">:</span> <span class="pl-s1"><span class="pl-pds">"</span>desc<span class="pl-pds">"</span></span>}
+
+DatatableJs <span class="pl-k">-</span> Could not <span class="pl-k">import</span> row<span class="pl-k">:</span> <span class="pl-s1"><span class="pl-pds">"</span>id<span class="pl-pds">"</span></span> value is invalid <span class="pl-c1">3</span> <span class="pl-s3">Object</span> {type<span class="pl-k">:</span> <span class="pl-st">function</span>, nullable<span class="pl-k">:</span> <span class="pl-c1">false</span>, sort_comparator<span class="pl-k">:</span> <span class="pl-c1">undefined</span>, sort_transformer<span class="pl-k">:</span> <span class="pl-c1">undefined</span>, sort_direction<span class="pl-k">:</span> <span class="pl-s1"><span class="pl-pds">"</span>desc<span class="pl-pds">"</span></span>}
+
+DatatableJs <span class="pl-k">-</span> <span class="pl-c1">3</span> of <span class="pl-c1">27</span> data rows were invalid
+
+<span class="pl-c1">4</span> <span class="pl-c1">0</span> <span class="pl-c1">undefined</span>
+<span class="pl-c1">5</span> <span class="pl-c1">1</span> <span class="pl-c1">null</span>
+<span class="pl-c1">6</span> <span class="pl-c1">2</span> <span class="pl-c1">1</span>
+<span class="pl-c1">7</span> <span class="pl-s1"><span class="pl-pds">"</span>0<span class="pl-pds">"</span></span> <span class="pl-c1">0</span>
+<span class="pl-c1">8</span> <span class="pl-s1"><span class="pl-pds">"</span>1<span class="pl-pds">"</span></span> <span class="pl-c1">1</span>
+<span class="pl-c1">9</span> <span class="pl-s1"><span class="pl-pds">"</span>2<span class="pl-pds">"</span></span> <span class="pl-c1">0</span>
+<span class="pl-c1">11</span> <span class="pl-c1">0</span> <span class="pl-c1">0</span>
+<span class="pl-c1">12</span> <span class="pl-c1">1</span> <span class="pl-c1">1</span>
+<span class="pl-c1">13</span> <span class="pl-c1">2</span> <span class="pl-c1">0</span>
+<span class="pl-c1">14</span> <span class="pl-c1">0</span> <span class="pl-c1">1</span>
+<span class="pl-c1">15</span> <span class="pl-c1">1</span> <span class="pl-c1">0</span>
+<span class="pl-c1">16</span> <span class="pl-c1">2</span> <span class="pl-c1">1</span>
+<span class="pl-c1">17</span> <span class="pl-c1">0</span> <span class="pl-c1">0</span>
+<span class="pl-c1">18</span> <span class="pl-c1">1</span> <span class="pl-c1">1</span>
+<span class="pl-c1">19</span> <span class="pl-c1">2</span> <span class="pl-c1">0</span>
+<span class="pl-c1">21</span> <span class="pl-c1">0</span> <span class="pl-c1">0</span>
+<span class="pl-c1">22</span> <span class="pl-c1">1</span> <span class="pl-c1">1</span>
+<span class="pl-c1">23</span> <span class="pl-c1">2</span> <span class="pl-c1">0</span>
+<span class="pl-c1">24</span> <span class="pl-c1">0</span> <span class="pl-c1">1</span>
+<span class="pl-c1">25</span> <span class="pl-c1">1</span> <span class="pl-c1">0</span>
+<span class="pl-c1">26</span> <span class="pl-c1">2</span> <span class="pl-c1">1</span>
+<span class="pl-c1">27</span> <span class="pl-c1">0</span> <span class="pl-c1">0</span>
+<span class="pl-c1">28</span> <span class="pl-c1">1</span> <span class="pl-c1">1</span>
+<span class="pl-c1">29</span> <span class="pl-c1">2</span> <span class="pl-c1">0</span></pre></div>
+
+<p>Example 3: Filter the data</p>
+
+<div class="highlight highlight-javascript"><pre><span class="pl-s">var</span> datatable <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-en">DatatableJs</span>({data<span class="pl-k">:</span> sample_data});
+<span class="pl-s">var</span> filter <span class="pl-k">=</span> datatable.createFilter();
+filter.addFilterRule({
+    fields<span class="pl-k">:</span> <span class="pl-s1"><span class="pl-pds">'</span>id<span class="pl-pds">'</span></span>,
+    comparators<span class="pl-k">:</span> <span class="pl-s1"><span class="pl-pds">'</span>&gt;<span class="pl-pds">'</span></span>,
+    values<span class="pl-k">:</span> <span class="pl-c1">10</span>
+});
+<span class="pl-s">var</span> row;
+<span class="pl-k">while</span> (row <span class="pl-k">=</span> filter.<span class="pl-sc">next</span>()) {
+    <span class="pl-en">console</span><span class="pl-s3">.log</span>(row.<span class="pl-sc">id</span>, row.col1, row.col2);
+}
+
+<span class="pl-c">// OUTPUT:</span>
+<span class="pl-c1">11</span> <span class="pl-c1">0</span> <span class="pl-c1">0</span>
+<span class="pl-c1">12</span> <span class="pl-c1">1</span> <span class="pl-c1">1</span>
+<span class="pl-c1">13</span> <span class="pl-c1">2</span> <span class="pl-c1">0</span>
+<span class="pl-c1">14</span> <span class="pl-c1">0</span> <span class="pl-c1">1</span>
+<span class="pl-c1">15</span> <span class="pl-c1">1</span> <span class="pl-c1">0</span>
+<span class="pl-c1">16</span> <span class="pl-c1">2</span> <span class="pl-c1">1</span>
+<span class="pl-c1">17</span> <span class="pl-c1">0</span> <span class="pl-c1">0</span>
+<span class="pl-c1">18</span> <span class="pl-c1">1</span> <span class="pl-c1">1</span>
+<span class="pl-c1">19</span> <span class="pl-c1">2</span> <span class="pl-c1">0</span>
+<span class="pl-c1">21</span> <span class="pl-c1">0</span> <span class="pl-c1">0</span>
+<span class="pl-c1">22</span> <span class="pl-c1">1</span> <span class="pl-c1">1</span>
+<span class="pl-c1">23</span> <span class="pl-c1">2</span> <span class="pl-c1">0</span>
+<span class="pl-c1">24</span> <span class="pl-c1">0</span> <span class="pl-c1">1</span>
+<span class="pl-c1">25</span> <span class="pl-c1">1</span> <span class="pl-c1">0</span>
+<span class="pl-c1">26</span> <span class="pl-c1">2</span> <span class="pl-c1">1</span>
+<span class="pl-c1">27</span> <span class="pl-c1">0</span> <span class="pl-c1">0</span>
+<span class="pl-c1">28</span> <span class="pl-c1">1</span> <span class="pl-c1">1</span>
+<span class="pl-c1">29</span> <span class="pl-c1">2</span> <span class="pl-c1">0</span></pre></div>
+
+<p>Example 4: Sort the data</p>
+
+<div class="highlight highlight-javascript"><pre><span class="pl-s">var</span> datatable <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-en">DatatableJs</span>({data<span class="pl-k">:</span> sample_data});
+<span class="pl-s">var</span> filter <span class="pl-k">=</span> datatable.createFilter();
+filter.addSortRule({
+    column<span class="pl-k">:</span> <span class="pl-s1"><span class="pl-pds">'</span>col1<span class="pl-pds">'</span></span>,
+    direction<span class="pl-k">:</span> <span class="pl-s1"><span class="pl-pds">'</span>desc<span class="pl-pds">'</span></span>,
+    <span class="pl-en">comparator</span>: <span class="pl-st">function</span>(<span class="pl-vpf">a</span>, <span class="pl-vpf">b</span>) {
+        <span class="pl-k">if</span> (a <span class="pl-k">==</span> b) {<span class="pl-k">return</span> <span class="pl-c1">0</span>;}
+        <span class="pl-k">if</span> (a <span class="pl-k">&gt;</span> b) {<span class="pl-k">return</span> <span class="pl-c1">1</span>;}
+        <span class="pl-k">return</span> <span class="pl-k">-</span><span class="pl-c1">1</span>;
+    },
+    <span class="pl-en">transformer</span>: <span class="pl-st">function</span>(<span class="pl-vpf">a</span>) {<span class="pl-k">return</span> <span class="pl-s3">Number</span>(a);}
+});
+filter.addSortRule({
+    column<span class="pl-k">:</span> <span class="pl-s1"><span class="pl-pds">'</span>col2<span class="pl-pds">'</span></span>
+});
+<span class="pl-s">var</span> row;
+<span class="pl-k">while</span> (row <span class="pl-k">=</span> filter.<span class="pl-sc">next</span>()) {
+    <span class="pl-en">console</span><span class="pl-s3">.log</span>(row.<span class="pl-sc">id</span>, row.col1, row.col2);
+}
+
+<span class="pl-c">// OUTPUT: - Note, null and undefined are automatically sorted to the bottom by</span>
+<span class="pl-c">// default.</span>
+<span class="pl-c1">undefined</span> <span class="pl-c1">0</span> <span class="pl-c1">0</span>
+<span class="pl-c1">11</span> <span class="pl-c1">0</span> <span class="pl-c1">0</span>
+<span class="pl-c1">17</span> <span class="pl-c1">0</span> <span class="pl-c1">0</span>
+<span class="pl-c1">7</span> <span class="pl-s1"><span class="pl-pds">"</span>0<span class="pl-pds">"</span></span> <span class="pl-c1">0</span>
+<span class="pl-c1">21</span> <span class="pl-c1">0</span> <span class="pl-c1">0</span>
+<span class="pl-c1">27</span> <span class="pl-c1">0</span> <span class="pl-c1">0</span>
+<span class="pl-c1">15</span> <span class="pl-c1">1</span> <span class="pl-c1">0</span>
+<span class="pl-c1">25</span> <span class="pl-c1">1</span> <span class="pl-c1">0</span>
+<span class="pl-c1">3</span> <span class="pl-c1">2</span> <span class="pl-c1">0</span>
+<span class="pl-c1">13</span> <span class="pl-c1">2</span> <span class="pl-c1">0</span>
+<span class="pl-c1">19</span> <span class="pl-c1">2</span> <span class="pl-c1">0</span>
+<span class="pl-c1">23</span> <span class="pl-c1">2</span> <span class="pl-c1">0</span>
+<span class="pl-c1">9</span> <span class="pl-s1"><span class="pl-pds">"</span>2<span class="pl-pds">"</span></span> <span class="pl-c1">0</span>
+<span class="pl-c1">29</span> <span class="pl-c1">2</span> <span class="pl-c1">0</span>
+<span class="pl-c1">14</span> <span class="pl-c1">0</span> <span class="pl-c1">1</span>
+<span class="pl-c1">24</span> <span class="pl-c1">0</span> <span class="pl-c1">1</span>
+<span class="pl-c1">null</span> <span class="pl-c1">1</span> <span class="pl-c1">1</span>
+<span class="pl-c1">12</span> <span class="pl-c1">1</span> <span class="pl-c1">1</span>
+<span class="pl-c1">8</span> <span class="pl-s1"><span class="pl-pds">"</span>1<span class="pl-pds">"</span></span> <span class="pl-c1">1</span>
+<span class="pl-c1">18</span> <span class="pl-c1">1</span> <span class="pl-c1">1</span>
+<span class="pl-c1">22</span> <span class="pl-c1">1</span> <span class="pl-c1">1</span>
+<span class="pl-c1">28</span> <span class="pl-c1">1</span> <span class="pl-c1">1</span>
+<span class="pl-c1">6</span> <span class="pl-c1">2</span> <span class="pl-c1">1</span>
+<span class="pl-c1">16</span> <span class="pl-c1">2</span> <span class="pl-c1">1</span>
+<span class="pl-c1">26</span> <span class="pl-c1">2</span> <span class="pl-c1">1</span>
+<span class="pl-c1">4</span> <span class="pl-c1">0</span> <span class="pl-c1">undefined</span>
+<span class="pl-c1">5</span> <span class="pl-c1">1</span> <span class="pl-c1">null</span></pre></div>
+
+<p>Example 5: Paginate the data</p>
+
+<div class="highlight highlight-javascript"><pre><span class="pl-s">var</span> datatable <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-en">DatatableJs</span>({data<span class="pl-k">:</span> sample_data});
+<span class="pl-s">var</span> filter <span class="pl-k">=</span> datatable.createFilter();
+filter.setPaginationRule({
+    enabled<span class="pl-k">:</span> <span class="pl-c1">true</span>
+    , rows_per_page<span class="pl-k">:</span> <span class="pl-c1">10</span>
+    , current_page<span class="pl-k">:</span> <span class="pl-c1">2</span>
+});
+<span class="pl-s">var</span> row;
+<span class="pl-k">while</span> (row <span class="pl-k">=</span> filter.<span class="pl-sc">next</span>()) {
+    <span class="pl-en">console</span><span class="pl-s3">.log</span>(row.<span class="pl-sc">id</span>, row.col1, row.col2);
+}
+
+<span class="pl-c">// OUTPUT:</span>
+<span class="pl-c1">12</span> <span class="pl-c1">1</span> <span class="pl-c1">1</span>
+<span class="pl-c1">13</span> <span class="pl-c1">2</span> <span class="pl-c1">0</span>
+<span class="pl-c1">14</span> <span class="pl-c1">0</span> <span class="pl-c1">1</span>
+<span class="pl-c1">15</span> <span class="pl-c1">1</span> <span class="pl-c1">0</span>
+<span class="pl-c1">16</span> <span class="pl-c1">2</span> <span class="pl-c1">1</span>
+<span class="pl-c1">17</span> <span class="pl-c1">0</span> <span class="pl-c1">0</span>
+<span class="pl-c1">18</span> <span class="pl-c1">1</span> <span class="pl-c1">1</span>
+<span class="pl-c1">19</span> <span class="pl-c1">2</span> <span class="pl-c1">0</span>
+<span class="pl-c1">21</span> <span class="pl-c1">0</span> <span class="pl-c1">0</span>
+<span class="pl-c1">22</span> <span class="pl-c1">1</span> <span class="pl-c1">1</span></pre></div>
+
+<p>Example 6: All of the filter rules can be commbined in any way</p>
+
+<div class="highlight highlight-javascript"><pre><span class="pl-s">var</span> datatable <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-en">DatatableJs</span>({
+    data<span class="pl-k">:</span> sample_data
+    , schema<span class="pl-k">:</span> sample_schema
+});
+<span class="pl-s">var</span> filter <span class="pl-k">=</span> datatable.createFilter();
+
+filter
+
+    <span class="pl-c">// Individual filter rules perform an 'AND' match between each other, so each</span>
+    <span class="pl-c">// row must match all of the filter rules that have been defined</span>
+    .addFilterRule({
+
+        <span class="pl-c">// A single field containing the data to filter on</span>
+        fields<span class="pl-k">:</span> <span class="pl-s1"><span class="pl-pds">'</span>id<span class="pl-pds">'</span></span>
+
+        <span class="pl-c">// A single comparison method, may be one of:</span>
+        <span class="pl-c">//     '&gt;'</span>
+        <span class="pl-c">//     '&gt;='</span>
+        <span class="pl-c">//     '&lt;'</span>
+        <span class="pl-c">//     '&lt;='</span>
+        <span class="pl-c">//     '=='</span>
+        <span class="pl-c">//     '==='</span>
+        <span class="pl-c">//     '!='</span>
+        <span class="pl-c">//     '!=='</span>
+        <span class="pl-c">//     or a custom function comparing the data from the table to the values</span>
+        <span class="pl-c">//     defined here</span>
+        , comparators<span class="pl-k">:</span> <span class="pl-s1"><span class="pl-pds">'</span>&gt;<span class="pl-pds">'</span></span>
+
+        <span class="pl-c">// A single value to compare the data with</span>
+        , values<span class="pl-k">:</span> <span class="pl-c1">10</span>
+    })
+
+    <span class="pl-c">// Multiple matching combinations can be defined in a single filter rule by</span>
+    <span class="pl-c">// listing them in an array.  Every filter option will accept an array and</span>
+    <span class="pl-c">// check for all possible matches, performing an 'OR' search</span>
+    .addFilterRule({
+
+        <span class="pl-c">// A list of fields containing the data to filter on</span>
+        fields<span class="pl-k">:</span> [<span class="pl-s1"><span class="pl-pds">'</span>col1<span class="pl-pds">'</span></span>, <span class="pl-s1"><span class="pl-pds">'</span>col2<span class="pl-pds">'</span></span>]
+
+        <span class="pl-c">// A list of comparison methods.  Each one will be tested against the data</span>
+        <span class="pl-c">// in all listed fields to see if it matches any listed value.</span>
+        , comparators<span class="pl-k">:</span> [
+            <span class="pl-s1"><span class="pl-pds">'</span>=<span class="pl-pds">'</span></span>
+
+            <span class="pl-c">// The first argument is a value from one of the listed fields and</span>
+            <span class="pl-c">// the second is a value from the list of values</span>
+            , <span class="pl-st">function</span>(<span class="pl-vpf">data</span>, <span class="pl-vpf">values</span>) {   <span class="pl-c">// By ignoring the values argument, I can make</span>
+                <span class="pl-k">return</span> (<span class="pl-c1">1</span> <span class="pl-k">===</span> data <span class="pl-k">%</span> <span class="pl-c1">2</span>);   <span class="pl-c">// this match all odd values as well as 2</span>
+            }
+        ]
+
+        <span class="pl-c">// A list of values to compare the data with</span>
+        , values<span class="pl-k">:</span> [<span class="pl-c1">2</span>]
+    })
+
+    <span class="pl-c">// Sorting accepts four parameters but only the column name is required</span>
+    .addSortRule({
+
+        <span class="pl-c">// The name of the column to sort by</span>
+        column<span class="pl-k">:</span> <span class="pl-s1"><span class="pl-pds">'</span>col1<span class="pl-pds">'</span></span>
+
+        <span class="pl-c">// Optional, either 'asc' or 'desc.  If omitted:</span>
+        <span class="pl-c">//     - if a schema has been defined for this column and that schema has</span>
+        <span class="pl-c">//       a sort_direction defined, sort in that direction and toggle sort</span>
+        <span class="pl-c">//       directions on the same column after that</span>
+        <span class="pl-c">//     - if a schema has not been defined or does not have a sort_direction</span>
+        <span class="pl-c">//       value, sort ascending and toggle sort directions on the same column</span>
+        <span class="pl-c">//       after that</span>
+        , direction<span class="pl-k">:</span> <span class="pl-s1"><span class="pl-pds">'</span>desc<span class="pl-pds">'</span></span>
+
+        <span class="pl-c">// Optional, a custom function to use for sort comparisons.  Accepts 2 values</span>
+        <span class="pl-c">// to compare and returns either -1, 0 or 1.</span>
+        <span class="pl-c">//     -1 if a is less than b</span>
+        <span class="pl-c">//     0 if a is equal to b</span>
+        <span class="pl-c">//     1 if a is greather than b</span>
+        <span class="pl-c">// @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort</span>
+        , <span class="pl-en">comparator</span>: <span class="pl-st">function</span>(<span class="pl-vpf">a</span>, <span class="pl-vpf">b</span>) {
+            <span class="pl-k">if</span> (a <span class="pl-k">==</span> b) {<span class="pl-k">return</span> <span class="pl-c1">0</span>;}
+            <span class="pl-k">if</span> (a <span class="pl-k">&gt;</span> b) {<span class="pl-k">return</span> <span class="pl-c1">1</span>;}
+            <span class="pl-k">return</span> <span class="pl-k">-</span><span class="pl-c1">1</span>;
+        }
+
+        <span class="pl-c">// Optional, a custom function to transform values prior to comparison.</span>
+        , <span class="pl-en">transformer</span>: <span class="pl-st">function</span>(<span class="pl-vpf">a</span>) {
+            <span class="pl-k">return</span> <span class="pl-s3">Number</span>(a); <span class="pl-c">// typecast to catch rows 7 - 9 before they're compared with any of the other values</span>
+        }
+    })
+
+    <span class="pl-c">// Any number of sort rules can be added but remember, each one sorts the entire</span>
+    <span class="pl-c">// data set which can be noticeably slow with large data sets in a web browser.</span>
+    <span class="pl-c">// This will perform a stable multi-column sort of the data.</span>
+    .addSortRule({
+        column<span class="pl-k">:</span> <span class="pl-s1"><span class="pl-pds">'</span>col2<span class="pl-pds">'</span></span>
+    })
+
+    <span class="pl-c">// Only one pagination rule can be used at a time, calling this method again will</span>
+    <span class="pl-c">// overwrite the current rule value</span>
+    <span class="pl-c">//</span>
+    <span class="pl-c">// All parameters are optional and only specified parameters are updated.</span>
+    .setPaginationRule({
+
+        <span class="pl-c">// Boolean, enable or disable pagination</span>
+        enabled<span class="pl-k">:</span> <span class="pl-c1">true</span>
+
+        <span class="pl-c">// Number, the page number to return data for</span>
+        , current_page<span class="pl-k">:</span> <span class="pl-c1">2</span>
+
+        <span class="pl-c">// Number, number of filtered rows next() will run through before stopping</span>
+        , rows_per_page<span class="pl-k">:</span> <span class="pl-c1">5</span>
+    });
+
+<span class="pl-s">var</span> row;
+<span class="pl-k">while</span> (row <span class="pl-k">=</span> filter.<span class="pl-sc">next</span>()) {
+    <span class="pl-en">console</span><span class="pl-s3">.log</span>(row.<span class="pl-sc">id</span>, row.col1, row.col2);
+}
+
+<span class="pl-c">// OUTPUT:</span>
+DatatableJs <span class="pl-k">-</span> Could not <span class="pl-k">import</span> row<span class="pl-k">:</span> <span class="pl-s1"><span class="pl-pds">"</span>id<span class="pl-pds">"</span></span> value is invalid <span class="pl-c1">undefined</span> <span class="pl-s3">Object</span> {type<span class="pl-k">:</span> <span class="pl-st">function</span>, nullable<span class="pl-k">:</span> <span class="pl-c1">false</span>, sort_comparator<span class="pl-k">:</span> <span class="pl-c1">undefined</span>, sort_transformer<span class="pl-k">:</span> <span class="pl-c1">undefined</span>, sort_direction<span class="pl-k">:</span> <span class="pl-s1"><span class="pl-pds">"</span>desc<span class="pl-pds">"</span></span>}
+
+DatatableJs <span class="pl-k">-</span> Could not <span class="pl-k">import</span> row<span class="pl-k">:</span> <span class="pl-s1"><span class="pl-pds">"</span>id<span class="pl-pds">"</span></span> value is invalid <span class="pl-c1">null</span> <span class="pl-s3">Object</span> {type<span class="pl-k">:</span> <span class="pl-st">function</span>, nullable<span class="pl-k">:</span> <span class="pl-c1">false</span>, sort_comparator<span class="pl-k">:</span> <span class="pl-c1">undefined</span>, sort_transformer<span class="pl-k">:</span> <span class="pl-c1">undefined</span>, sort_direction<span class="pl-k">:</span> <span class="pl-s1"><span class="pl-pds">"</span>desc<span class="pl-pds">"</span></span>}
+
+DatatableJs <span class="pl-k">-</span> Could not <span class="pl-k">import</span> row<span class="pl-k">:</span> <span class="pl-s1"><span class="pl-pds">"</span>id<span class="pl-pds">"</span></span> value is invalid <span class="pl-c1">3</span> <span class="pl-s3">Object</span> {type<span class="pl-k">:</span> <span class="pl-st">function</span>, nullable<span class="pl-k">:</span> <span class="pl-c1">false</span>, sort_comparator<span class="pl-k">:</span> <span class="pl-c1">undefined</span>, sort_transformer<span class="pl-k">:</span> <span class="pl-c1">undefined</span>, sort_direction<span class="pl-k">:</span> <span class="pl-s1"><span class="pl-pds">"</span>desc<span class="pl-pds">"</span></span>}
+
+DatatableJs <span class="pl-k">-</span> <span class="pl-c1">3</span> of <span class="pl-c1">27</span> data rows were invalid
+
+<span class="pl-c1">18</span> <span class="pl-c1">1</span> <span class="pl-c1">1</span>
+<span class="pl-c1">22</span> <span class="pl-c1">1</span> <span class="pl-c1">1</span>
+<span class="pl-c1">28</span> <span class="pl-c1">1</span> <span class="pl-c1">1</span>
+<span class="pl-c1">26</span> <span class="pl-c1">2</span> <span class="pl-c1">1</span>
+<span class="pl-c1">16</span> <span class="pl-c1">2</span> <span class="pl-c1">1</span></pre></div>
+
+<h2>
+<a id="contributing" class="anchor" href="#contributing" aria-hidden="true"><span class="octicon octicon-link"></span></a>Contributing</h2>
+
+<h3>
+<a id="using-the-issue-tracker" class="anchor" href="#using-the-issue-tracker" aria-hidden="true"><span class="octicon octicon-link"></span></a>Using the issue tracker</h3>
+
+<p>The <a href="https://github.com/mkenney/DatatableJs/issues">issue tracker</a> is the preferred
+channel for bug reports, features requests and submitting pull requests, but
+please respect the following restrictions:</p>
+
+<ul>
+<li><p>Please <strong>do not</strong> use the issue tracker for personal support requests.</p></li>
+<li><p>Please <strong>do not</strong> derail or troll issues. Keep the discussion on topic and
+respect the opinions of others.</p></li>
+</ul>
+
+<h4>
+<a id="bug-reports" class="anchor" href="#bug-reports" aria-hidden="true"><span class="octicon octicon-link"></span></a>Bug reports</h4>
+
+<p>A bug is a <em>demonstrable problem</em> that is caused by the code in the repository.
+Good bug reports are extremely helpful!</p>
+
+<p>Guidelines for bug reports:</p>
+
+<ol>
+<li><p><strong>Validate and lint your code</strong> - <a href="http://jshint.com/">lint your JS code</a>
+ to ensure your problem isn't caused by an error in your own code.</p></li>
+<li><p><strong><a href="https://github.com/mkenney/DatatableJs/issues">Use the GitHub issue search</a></strong>  check if the issue has already been
+ reported.</p></li>
+<li><p><strong>Check if the issue has been fixed</strong> - try to reproduce it using the
+ latest <code>master</code> branch in the repository</p></li>
+<li><p><strong>Isolate the problem</strong> - ideally create a <a href="http://css-tricks.com/6263-reduced-test-cases/">reduced test
+ case</a> and a <a href="http://jsfiddle.net/">live example</a>.</p></li>
+</ol>
+
+<p>Example:</p>
+
+<blockquote>
+<p>Short and descriptive example bug report title</p>
+
+<p>A summary of the issue and the browser/OS environment in which it occurs. If
+suitable, include the steps required to reproduce the bug.</p>
+
+<ol>
+<li>This is the first step</li>
+<li>This is the second step</li>
+<li>Further steps, etc.</li>
+</ol>
+
+<p><code>&lt;url&gt;</code> - a link to the reduced test case or live example</p>
+
+<p>Any other information you want to share that is relevant to the issue being
+reported. This might include the lines of code that you have identified as
+causing the bug, and potential solutions (and your opinions on their
+merits).</p>
+</blockquote>
+
+<h2>
+<a id="versioning" class="anchor" href="#versioning" aria-hidden="true"><span class="octicon octicon-link"></span></a>Versioning</h2>
+
+<p>For transparency and in striving to maintain backward compatibility, DatatableJs is
+maintained under <a href="http://semver.org/">the Semantic Versioning guidelines</a>.  I'll
+adhere to those rules whenever possible.</p>
+
+<h2>
+<a id="creator" class="anchor" href="#creator" aria-hidden="true"><span class="octicon octicon-link"></span></a>Creator</h2>
+
+<p><strong>Michael Kenney</strong></p>
+
+<ul>
+<li><a href="https://github.com/mkenney">https://github.com/mkenney</a></li>
+<li><a href="https://www.linkedin.com/in/michaelkenney">https://www.linkedin.com/in/michaelkenney</a></li>
+</ul>
+
+<h2>
+<a id="copyright-and-license" class="anchor" href="#copyright-and-license" aria-hidden="true"><span class="octicon octicon-link"></span></a>Copyright and license</h2>
+
+<p>Code and documentation copyright 2014-2015 Michael Kenney. Released under
+<a href="https://github.com/mkenney/DatatableJs/blob/master/LICENSE">the MIT license</a>.</p>
+      </section>
+
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    
+  </body>
+</html>
