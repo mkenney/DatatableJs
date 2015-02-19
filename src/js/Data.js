@@ -69,7 +69,7 @@
 	 * @return {DatatableJs.lib.Data}
 	 */
 	Data.prototype.setData = function(rows) {
-		if (!rows instanceof Array) {throw new global.DatatableJs.lib.Exception('Data must be an array of row objects');}
+		if (!rows instanceof Array) {throw new global.DatatableJs.lib.Exception('Data must be an array objects representing rows');}
 
 		this.truncate();
 		this._current_sort_column    = undefined;
@@ -81,9 +81,9 @@
 			this.addRow(rows[row_key]);
 		}
 
-		if (0 === row_key)                              {window.console.info('DatatableJs - No data rows found');}
-		if (0 === this.getData().length && row_key > 0) {window.console.warn('DatatableJs - No valid data rows found');}
-		if (this.getData().length < row_key)            {window.console.warn('DatatableJs - '+(row_key - this.getData().length)+' of '+row_key+' data rows were invalid');}
+		if (0 === row_key)                              {global.console.info('DatatableJs - No data rows found');}
+		if (0 === this.getData().length && row_key > 0) {global.console.info('DatatableJs - No valid data rows found');}
+		if (this.getData().length < row_key)            {global.console.info('DatatableJs - '+(row_key - this.getData().length)+' of '+row_key+' data rows were invalid');}
 
 		return this;
 	};
@@ -96,7 +96,7 @@
 	 */
 	Data.prototype.addRow = function(row) {
 		if ('object' !== typeof row)       {throw new global.DatatableJs.lib.Exception('Row data must be a simple object');}
-		if (0 === Object.keys(row).length) {window.console.warn('DatatableJs - An attempt to insert an empty data row rejected');}
+		if (0 === Object.keys(row).length) {global.console.warn('DatatableJs - An attempt to insert an empty data row rejected');}
 
 		var is_valid_row = true;
 		if (this.getSchema() instanceof global.DatatableJs.lib.Schema) {

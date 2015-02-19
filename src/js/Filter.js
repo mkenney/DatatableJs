@@ -186,7 +186,7 @@
 
 		// Rule rejected
 		} else {
-			window.console.error('DatatableJs - An invalid filter definition was rejected', filter);
+			global.console.error('DatatableJs - An invalid filter definition was rejected', filter);
 		}
 
 		return this;
@@ -210,7 +210,7 @@
 
 		// Rule rejected
 		} else {
-			window.console.error('DatatableJs - An invalid sort definition was rejected', sort);
+			global.console.error('DatatableJs - An invalid sort definition was rejected', sort);
 		}
 
 		return this;

@@ -30,19 +30,19 @@ Within the repository you'll find a directory and file structure similar to this
 DatatableJs/
     │
     ├── src/
-    │    └──js/
-    │        ├── Column.js
-    │        ├── Data.js
-    │        ├── DatatableJs.js
-    │        ├── Exception.js
-    │        └── Filter.js
-    │        └── Schema.js
+    │   └──js/
+    │       ├── Column.js
+    │       ├── Data.js
+    │       ├── DatatableJs.js
+    │       ├── Exception.js
+    │       ├── Filter.js
+    │       └── Schema.js
     │
     └── assets/
-         └──js/
-             ├── DatatableJs.js
-             ├── DatatableJs.map
-             └── DatatableJs.min.js
+        └──js/
+            ├── DatatableJs.js
+            ├── DatatableJs.map
+            └── DatatableJs.min.js
 ```
 
 The compiled file (`DatatableJs.js`) and [source map](https://developers.google.com/chrome-developer-tools/docs/css-preprocessors)
@@ -69,83 +69,83 @@ The following examples will reference this schema and data set:
 // Non-conforming rows will be removed from the data set when it is applied
 var sample_schema = {
 
-  // The key identifies a property expected in the data set
-  id: {
+    // The key identifies a property expected in the data set
+    id: {
 
-    // Optional
-    //
-    // Strings or function references for native types:
-    //     'Number' or Number to require numbers for example.  Does smart
-    //     type checking so in this case 1 or Number(1) or new Number(1) would
-    //     qualify but NaN would not
-    //
-    // Functions or even instances for custom objects
-    //     DatatableJs for example
-    type: Number
+        // Optional
+        //
+        // Strings or function references for native types:
+        //     'Number' or Number to require numbers for example.  Does smart
+        //     type checking so in this case 1 or Number(1) or new Number(1) would
+        //     qualify but NaN would not
+        //
+        // Functions or even instances for custom objects
+        //     DatatableJs for example
+        type: Number
 
-    // Optional, Boolean, default true.
-    //
-    // If true or omitted allow null, undefined and omitted values. If false,
-    // reject rows containing null, undefined or omitted values for this
-    // property.
-    , nullable: false
+        // Optional, Boolean, default true.
+        //
+        // If true or omitted allow null, undefined and omitted values. If false,
+        // reject rows containing null, undefined or omitted values for this
+        // property.
+        , nullable: false
 
-    // Optional, default custom comparator function to use when sorting this
-    // column.  This value is not used if a comparitor function is defined
-    // when calling addSortRule() on a filter instance.
-    , sort_comparator: undefined
+        // Optional, default custom comparator function to use when sorting this
+        // column.  This value is not used if a comparitor function is defined
+        // when calling addSortRule() on a filter instance.
+        , sort_comparator: undefined
 
-    // Optional, default data transformer function to use when before sorting
-    // the data in this column.  This value is not used if a transformer
-    // function is defined when calling addSortRule() on a filter instance.
-    , sort_transformer: undefined
+        // Optional, default data transformer function to use when before sorting
+        // the data in this column.  This value is not used if a transformer
+        // function is defined when calling addSortRule() on a filter instance.
+        , sort_transformer: undefined
 
-    // Optional, default sort direction for this column.  This value is not
-    // used if a sort_direction defined when calling addSortRule() on a
-    // filter instance.
-    , sort_direction:   'desc'
-  }
-  , col1: {
-    sort_direction: 'asc'
-  }
-  , col1: {
-    nullable: true
-    , sort_direction: 'asc'
-  }
+        // Optional, default sort direction for this column.  This value is not
+        // used if a sort_direction defined when calling addSortRule() on a
+        // filter instance.
+        , sort_direction:   'desc'
+    }
+    , col1: {
+        sort_direction: 'asc'
+    }
+    , col1: {
+        nullable: true
+        , sort_direction: 'asc'
+    }
 }
 
 
 // Data can be any array of objects
 var sample_data = [
-  { id: undefined,  col1: 0,   col2: 0 },
-  { id: null,       col1: 1,   col2: 1 },
-  { id: '3',        col1: 2,   col2: 0 },
-  { id: 4,          col1: 0,   col2: undefined },
-  { id: 5,          col1: 1,   col2: null },
-  { id: 6,          col1: 2,   col2: 1 },
-  { id: 7,          col1: '0', col2: 0 },
-  { id: 8,          col1: '1', col2: 1 },
-  { id: 9,          col1: '2', col2: 0 },
+    { id: undefined,  col1: 0,   col2: 0 },
+    { id: null,       col1: 1,   col2: 1 },
+    { id: '3',        col1: 2,   col2: 0 },
+    { id: 4,          col1: 0,   col2: undefined },
+    { id: 5,          col1: 1,   col2: null },
+    { id: 6,          col1: 2,   col2: 1 },
+    { id: 7,          col1: '0', col2: 0 },
+    { id: 8,          col1: '1', col2: 1 },
+    { id: 9,          col1: '2', col2: 0 },
 
-  { id: 11,         col1: 0,   col2: 0 },
-  { id: 12,         col1: 1,   col2: 1 },
-  { id: 13,         col1: 2,   col2: 0 },
-  { id: 14,         col1: 0,   col2: 1 },
-  { id: 15,         col1: 1,   col2: 0 },
-  { id: 16,         col1: 2,   col2: 1 },
-  { id: 17,         col1: 0,   col2: 0 },
-  { id: 18,         col1: 1,   col2: 1 },
-  { id: 19,         col1: 2,   col2: 0 },
+    { id: 11,         col1: 0,   col2: 0 },
+    { id: 12,         col1: 1,   col2: 1 },
+    { id: 13,         col1: 2,   col2: 0 },
+    { id: 14,         col1: 0,   col2: 1 },
+    { id: 15,         col1: 1,   col2: 0 },
+    { id: 16,         col1: 2,   col2: 1 },
+    { id: 17,         col1: 0,   col2: 0 },
+    { id: 18,         col1: 1,   col2: 1 },
+    { id: 19,         col1: 2,   col2: 0 },
 
-  { id: 21,         col1: 0,   col2: 0 },
-  { id: 22,         col1: 1,   col2: 1 },
-  { id: 23,         col1: 2,   col2: 0 },
-  { id: 24,         col1: 0,   col2: 1 },
-  { id: 25,         col1: 1,   col2: 0 },
-  { id: 26,         col1: 2,   col2: 1 },
-  { id: 27,         col1: 0,   col2: 0 },
-  { id: 28,         col1: 1,   col2: 1 },
-  { id: 29,         col1: 2,   col2: 0 }
+    { id: 21,         col1: 0,   col2: 0 },
+    { id: 22,         col1: 1,   col2: 1 },
+    { id: 23,         col1: 2,   col2: 0 },
+    { id: 24,         col1: 0,   col2: 1 },
+    { id: 25,         col1: 1,   col2: 0 },
+    { id: 26,         col1: 2,   col2: 1 },
+    { id: 27,         col1: 0,   col2: 0 },
+    { id: 28,         col1: 1,   col2: 1 },
+    { id: 29,         col1: 2,   col2: 0 }
 ];
 ```
 
@@ -156,7 +156,7 @@ var datatable = new DatatableJs({data: sample_data});
 var filter = datatable.createFilter();
 var row;
 while (row = filter.next()) {
-  console.log(row.id, row.col1, row.col2);
+    console.log(row.id, row.col1, row.col2);
 }
 
 // OUTPUT:
@@ -192,13 +192,13 @@ null 1 1
 Example 2: Apply a data schema
 ```javascript
 var datatable = new DatatableJs({
-  schema: sample_schema,
-  data: sample_data
+    schema: sample_schema,
+    data: sample_data
 });
 var filter = datatable.createFilter();
 var row;
 while (row = filter.next()) {
-  console.log(row.id, row.col1, row.col2);
+    console.log(row.id, row.col1, row.col2);
 }
 
 // OUTPUT:
@@ -241,13 +241,13 @@ Example 3: Filter the data
 var datatable = new DatatableJs({data: sample_data});
 var filter = datatable.createFilter();
 filter.addFilterRule({
-  fields: 'id',
-  comparators: '>',
-  values: 10
+    fields: 'id',
+    comparators: '>',
+    values: 10
 });
 var row;
 while (row = filter.next()) {
-  console.log(row.id, row.col1, row.col2);
+    console.log(row.id, row.col1, row.col2);
 }
 
 // OUTPUT:
@@ -276,21 +276,21 @@ Example 4: Sort the data
 var datatable = new DatatableJs({data: sample_data});
 var filter = datatable.createFilter();
 filter.addSortRule({
-  column: 'col1',
-  direction: 'desc',
-  comparator: function(a, b) {
-    if (a == b) {return 0;}
-    if (a > b) {return 1;}
-    return -1;
-  },
-  transformer: function(a) {return Number(a);}
+    column: 'col1',
+    direction: 'desc',
+    comparator: function(a, b) {
+        if (a == b) {return 0;}
+        if (a > b) {return 1;}
+        return -1;
+    },
+    transformer: function(a) {return Number(a);}
 });
 filter.addSortRule({
-  column: 'col2'
+    column: 'col2'
 });
 var row;
 while (row = filter.next()) {
-  console.log(row.id, row.col1, row.col2);
+    console.log(row.id, row.col1, row.col2);
 }
 
 // OUTPUT: - Note, null and undefined are automatically sorted to the bottom by
@@ -329,13 +329,13 @@ Example 5: Paginate the data
 var datatable = new DatatableJs({data: sample_data});
 var filter = datatable.createFilter();
 filter.setPaginationRule({
-  enabled: true
-  , rows_per_page: 10
-  , current_page: 2
+    enabled: true
+    , rows_per_page: 10
+    , current_page: 2
 });
 var row;
 while (row = filter.next()) {
-  console.log(row.id, row.col1, row.col2);
+    console.log(row.id, row.col1, row.col2);
 }
 
 // OUTPUT:
@@ -354,120 +354,120 @@ while (row = filter.next()) {
 Example 6: All of the filter rules can be commbined in any way
 ```javascript
 var datatable = new DatatableJs({
-  data: sample_data
-  , schema: sample_schema
+    data: sample_data
+    , schema: sample_schema
 });
 var filter = datatable.createFilter();
 
 filter
 
-  // Individual filter rules perform an 'AND' match between each other, so each
-  // row must match all of the filter rules that have been defined
-  .addFilterRule({
+    // Individual filter rules perform an 'AND' match between each other, so each
+    // row must match all of the filter rules that have been defined
+    .addFilterRule({
 
-    // A single field containing the data to filter on
-    fields: 'id'
+        // A single field containing the data to filter on
+        fields: 'id'
 
-    // A single comparison method, may be one of:
-    //     '>'
-    //     '>='
-    //     '<'
-    //     '<='
-    //     '=='
-    //     '==='
-    //     '!='
-    //     '!=='
-    //     or a custom function comparing the data from the table to the values
-    //     defined here
-    , comparators: '>'
+        // A single comparison method, may be one of:
+        //     '>'
+        //     '>='
+        //     '<'
+        //     '<='
+        //     '=='
+        //     '==='
+        //     '!='
+        //     '!=='
+        //     or a custom function comparing the data from the table to the values
+        //     defined here
+        , comparators: '>'
 
-    // A single value to compare the data with
-    , values: 10
-  })
+        // A single value to compare the data with
+        , values: 10
+    })
 
-  // Multiple matching combinations can be defined in a single filter rule by
-  // listing them in an array.  Every filter option will accept an array and
-  // check for all possible matches, performing an 'OR' search
-  .addFilterRule({
+    // Multiple matching combinations can be defined in a single filter rule by
+    // listing them in an array.  Every filter option will accept an array and
+    // check for all possible matches, performing an 'OR' search
+    .addFilterRule({
 
-    // A list of fields containing the data to filter on
-    fields: ['col1', 'col2']
+        // A list of fields containing the data to filter on
+        fields: ['col1', 'col2']
 
-    // A list of comparison methods.  Each one will be tested against the data
-    // in all listed fields to see if it matches any listed value.
-    , comparators: [
-      '='
+        // A list of comparison methods.  Each one will be tested against the data
+        // in all listed fields to see if it matches any listed value.
+        , comparators: [
+            '='
 
-      // The first argument is a value from one of the listed fields and
-      // the second is a value from the list of values
-      , function(data, values) {   // By ignoring the values argument, I can make
-        return (1 === data % 2);   // this match all odd values as well as 2
-      }
-    ]
+            // The first argument is a value from one of the listed fields and
+            // the second is a value from the list of values
+            , function(data, values) {   // By ignoring the values argument, I can make
+                return (1 === data % 2);   // this match all odd values as well as 2
+            }
+        ]
 
-    // A list of values to compare the data with
-    , values: [2]
-  })
+        // A list of values to compare the data with
+        , values: [2]
+    })
 
-  // Sorting accepts four parameters but only the column name is required
-  .addSortRule({
+    // Sorting accepts four parameters but only the column name is required
+    .addSortRule({
 
-    // The name of the column to sort by
-    column: 'col1'
+        // The name of the column to sort by
+        column: 'col1'
 
-    // Optional, either 'asc' or 'desc.  If omitted:
-    //     - if a schema has been defined for this column and that schema has
-    //       a sort_direction defined, sort in that direction and toggle sort
-    //       directions on the same column after that
-    //     - if a schema has not been defined or does not have a sort_direction
-    //       value, sort ascending and toggle sort directions on the same column
-    //       after that
-    , direction: 'desc'
+        // Optional, either 'asc' or 'desc.  If omitted:
+        //     - if a schema has been defined for this column and that schema has
+        //       a sort_direction defined, sort in that direction and toggle sort
+        //       directions on the same column after that
+        //     - if a schema has not been defined or does not have a sort_direction
+        //       value, sort ascending and toggle sort directions on the same column
+        //       after that
+        , direction: 'desc'
 
-    // Optional, a custom function to use for sort comparisons.  Accepts 2 values
-    // to compare and returns either -1, 0 or 1.
-    //     -1 if a is less than b
-    //     0 if a is equal to b
-    //     1 if a is greather than b
-    // @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort
-    , comparator: function(a, b) {
-      if (a == b) {return 0;}
-      if (a > b) {return 1;}
-      return -1;
-    }
+        // Optional, a custom function to use for sort comparisons.  Accepts 2 values
+        // to compare and returns either -1, 0 or 1.
+        //     -1 if a is less than b
+        //     0 if a is equal to b
+        //     1 if a is greather than b
+        // @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort
+        , comparator: function(a, b) {
+            if (a == b) {return 0;}
+            if (a > b) {return 1;}
+            return -1;
+        }
 
-    // Optional, a custom function to transform values prior to comparison.
-    , transformer: function(a) {
-      return Number(a); // typecast to catch rows 7 - 9 before they're compared with any of the other values
-    }
-  })
+        // Optional, a custom function to transform values prior to comparison.
+        , transformer: function(a) {
+            return Number(a); // typecast to catch rows 7 - 9 before they're compared with any of the other values
+        }
+    })
 
-  // Any number of sort rules can be added but remember, each one sorts the entire
-  // data set which can be noticeably slow with large data sets in a web browser.
-  // This will perform a stable multi-column sort of the data.
-  .addSortRule({
-    column: 'col2'
-  })
+    // Any number of sort rules can be added but remember, each one sorts the entire
+    // data set which can be noticeably slow with large data sets in a web browser.
+    // This will perform a stable multi-column sort of the data.
+    .addSortRule({
+        column: 'col2'
+    })
 
-  // Only one pagination rule can be used at a time, calling this method again will
-  // overwrite the current rule value
-  //
-  // All parameters are optional and only specified parameters are updated.
-  .setPaginationRule({
+    // Only one pagination rule can be used at a time, calling this method again will
+    // overwrite the current rule value
+    //
+    // All parameters are optional and only specified parameters are updated.
+    .setPaginationRule({
 
-    // Boolean, enable or disable pagination
-    enabled: true
+        // Boolean, enable or disable pagination
+        enabled: true
 
-    // Number, the page number to return data for
-    , current_page: 2
+        // Number, the page number to return data for
+        , current_page: 2
 
-    // Number, number of filtered rows next() will run through before stopping
-    , rows_per_page: 5
-  });
+        // Number, number of filtered rows next() will run through before stopping
+        , rows_per_page: 5
+    });
 
 var row;
 while (row = filter.next()) {
-  console.log(row.id, row.col1, row.col2);
+    console.log(row.id, row.col1, row.col2);
 }
 
 // OUTPUT:
@@ -497,7 +497,7 @@ please respect the following restrictions:
 * Please **do not** use the issue tracker for personal support requests.
 
 * Please **do not** derail or troll issues. Keep the discussion on topic and
-  respect the opinions of others.
+    respect the opinions of others.
 
 #### Bug reports
 
@@ -506,17 +506,17 @@ Good bug reports are extremely helpful!
 
 Guidelines for bug reports:
 
-0. **Validate and lint your code** &mdash; [lint your JS code](http://jshint.com/)
-   to ensure your problem isn't caused by an error in your own code.
+0. **Validate and lint your code** - [lint your JS code](http://jshint.com/)
+     to ensure your problem isn't caused by an error in your own code.
 
-1. **[Use the GitHub issue search](https://github.com/mkenney/DatatableJs/issues)** &mdash; check if the issue has already been
-   reported.
+1. **[Use the GitHub issue search](https://github.com/mkenney/DatatableJs/issues)**  check if the issue has already been
+     reported.
 
-2. **Check if the issue has been fixed** &mdash; try to reproduce it using the
-   latest `master` branch in the repository
+2. **Check if the issue has been fixed** - try to reproduce it using the
+     latest `master` branch in the repository
 
-3. **Isolate the problem** &mdash; ideally create a [reduced test
-   case](http://css-tricks.com/6263-reduced-test-cases/) and a [live example](http://jsfiddle.net/).
+3. **Isolate the problem** - ideally create a [reduced test
+     case](http://css-tricks.com/6263-reduced-test-cases/) and a [live example](http://jsfiddle.net/).
 
 
 Example:
