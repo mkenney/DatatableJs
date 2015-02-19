@@ -1,5 +1,5 @@
 /*!
- * ExtendJs v0.0.3 (https://github.com/mkenney/DatatableJs)
+ * DatatableJs v0.0.3 (https://github.com/mkenney/DatatableJs)
  * Copyright 2014-2015 Michael Kenney
  * Licensed under MIT (https://github.com/mkenney/DatatableJs/blob/master/LICENSE)
  */

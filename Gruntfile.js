@@ -1,9 +1,9 @@
 /*!
- * ExtendJs Gruntfile (https://github.com/mkenney/ExtendJs)
+ * DatatableJs Gruntfile (https://github.com/mkenney/DatatableJs)
  *
  * Copyright 2014 Michael Kenney
  *
- * Licensed under MIT (https://github.com/mkenney/ExtendJs/blob/master/LICENSE)
+ * Licensed under MIT (https://github.com/mkenney/DatatableJs/blob/master/LICENSE)
  */
 
 module.exports = function (grunt) {
@@ -18,7 +18,7 @@ module.exports = function (grunt) {
 		// Metadata
 		  pkg: grunt.file.readJSON('package.json')
 		, banner: '/*!\n'
-			+ ' * ExtendJs v<%= pkg.version %> (<%= pkg.homepage %>)\n'
+			+ ' * DatatableJs v<%= pkg.version %> (<%= pkg.homepage %>)\n'
 			+ ' * Copyright 2014-<%= grunt.template.today("yyyy") %> <%= pkg.author %>\n'
 			+ ' * Licensed under <%= pkg.license.type %> (<%= pkg.license.url %>)\n'
 			+ ' */\n'
