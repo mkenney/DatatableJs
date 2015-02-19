@@ -1,5 +1,3 @@
-/*jshint evil: true */
-/*jshint unused: true*/
 
 /**
  * Filter class for the DatatableJs library

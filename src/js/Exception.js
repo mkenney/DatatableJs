@@ -1,5 +1,3 @@
-/*jshint evil: true */
-/*jshint unused: true*/
 
 /**
  * Exception class for the DatatableJs library

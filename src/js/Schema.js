@@ -1,5 +1,3 @@
-/*jshint evil: true */
-/*jshint unused: true*/
 
 +function(global, undefined) {
 	'use strict';

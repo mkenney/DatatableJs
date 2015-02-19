@@ -5,9 +5,6 @@
  */
 
 
-/*jshint evil: true */
-/*jshint unused: true*/
-
 
 +function(global, undefined) {
 	'use strict';
@@ -167,8 +164,6 @@
 
 }(this);
 
-/*jshint evil: true */
-/*jshint unused: true*/
 
 /**
  * Exception class for the DatatableJs library
@@ -204,8 +199,6 @@
 
 }(this);
 
-/*jshint evil: true */
-/*jshint unused: true*/
 
 +function(global, undefined) {
 	'use strict';
@@ -431,8 +424,6 @@
 
 }(this);
 
-/*jshint evil: true */
-/*jshint unused: true*/
 
 +function(global, undefined) {
 	'use strict';
@@ -533,8 +524,6 @@
 
 }(this);
 
-/*jshint evil: true */
-/*jshint unused: true*/
 
 +function(global, undefined) {
 	'use strict';
@@ -755,26 +744,10 @@
 			// If a schema definition exists, look for sort options
 			if (this.getSchema().getColumn(column) instanceof global.DatatableJs.lib.Column) {
 
-				// If a transformer value exists but is a string, assume it's code
-				// and attempt to compile into a function
-				if ('string' === typeof this.getSchema().getColumn(column).get('sort_transformer')) {
-					this.getSchema().getColumn(column).set(
-						'sort_transformer'
-						, new Function('value', 'return ('+this.getSchema().getColumn(column).get('sort_transformer')+')(value);')
-					);
-				}
 				if ('function' === typeof this.getSchema().getColumn(column).get('sort_transformer')) {
 					transformer = this.getSchema().getColumn(column).get('sort_transformer');
 				}
 
-				// If a comparator value exists but is a string, assume it's code
-				// and attempt to compile into a function
-				if ('string' === typeof this.getSchema().getColumn(column).get('sort_comparator')) {
-					this.getSchema().getColumn(column).set(
-						'sort_transformer'
-						, new Function('value', 'return ('+this.getSchema().getColumn(column).get('sort_transformer')+')(value);')
-					);
-				}
 				if ('function' === typeof this.getSchema().getColumn(column).get('sort_comparator')) {
 					comparator = this.getSchema().getColumn(column).get('sort_comparator');
 				}
@@ -860,8 +833,6 @@
 
 }(this);
 
-/*jshint evil: true */
-/*jshint unused: true*/
 
 /**
  * Filter class for the DatatableJs library
