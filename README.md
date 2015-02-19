@@ -436,15 +436,15 @@ filter
       return -1;
     }
 
-    // Optional, a custom function transform values prior to comparison.
+    // Optional, a custom function to transform values prior to comparison.
     , transformer: function(a) {
-      return Number(a); // typecast to catch row 3 before it's compared with any of the other values
+      return Number(a); // typecast to catch rows 7 - 9 before they're compared with any of the other values
     }
   })
 
-  // Any number of sort rules can be added but remember each one sorts the entire
-  // data set which can be noticeable with large data sets in a web browser.  This
-  // will perform a stable multi-column sort of the data.
+  // Any number of sort rules can be added but remember, each one sorts the entire
+  // data set which can be noticeably slow with large data sets in a web browser.
+  // This will perform a stable multi-column sort of the data.
   .addSortRule({
     column: 'col2'
   })
