@@ -1,0 +1,34 @@
+{
+	  "disallowKeywords": ["with"]
+	, "disallowMixedSpacesAndTabs": "smart"
+	, "disallowMultipleLineStrings": true
+	, "disallowMultipleVarDecl": true
+	, "disallowQuotedKeysInObjects": "allButReserved"
+	, "disallowSpaceAfterPrefixUnaryOperators": ["++", "--", "+", "-", "~", "!"]
+	, "disallowSpaceBeforeBinaryOperators": [","]
+	, "disallowSpaceBeforePostfixUnaryOperators": ["++", "--"]
+	, "disallowSpacesInsideArrayBrackets": true
+	, "disallowSpacesInsideParentheses": true
+	, "disallowTrailingComma": true
+	, "disallowTrailingWhitespace": true
+	, "requireCapitalizedConstructors": true
+	, "requireDotNotation": true
+	, "requireLineFeedAtFileEnd": true
+	, "requireSpaceAfterBinaryOperators": ["-", "/", "*", "=", "==", "===", "!=", "!==", ">", "<", ">=", "<="]
+	, "requireSpaceAfterKeywords": ["if", "else", "for", "while", "do", "switch", "return", "try"]
+	, "requireSpaceAfterLineComment": true
+	, "requireSpaceBeforeBinaryOperators": ["-", "/", "*", "=", "==", "===", "!=", "!==", ">", "<", ">=", "<="]
+	, "requireSpaceBetweenArguments": true
+	, "requireSpacesInAnonymousFunctionExpression": { "beforeOpeningCurlyBrace": true }
+	, "requireSpacesInConditionalExpression": true
+	, "requireSpacesInForStatement": true
+	, "requireSpacesInFunctionDeclaration": { "beforeOpeningCurlyBrace": true }
+	, "requireSpacesInFunctionExpression": { "beforeOpeningCurlyBrace": true }
+	, "requireSpacesInNamedFunctionExpression": { "beforeOpeningCurlyBrace": true }
+	, "requireSpacesInsideObjectBrackets": "allButNested"
+	, "validateLineBreaks": "LF"
+	, "validateQuoteMarks": {
+		  "mark": "'"
+		, "escape": true
+	}
+}
