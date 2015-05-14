@@ -129,7 +129,7 @@
 
 	/**
 	 * Get the current DatatableJs.lib.Data reference
-	 * @return {Array}
+	 * @return {DatatableJs.lib.Data}
 	 */
 	Filter.prototype.getData = function() {
 		return this._data;
@@ -141,8 +141,27 @@
 	 * @return {DatatableJs.lib.Filter}
 	 */
 	Filter.prototype.setData = function(data) {
-		if (!data instanceof global.DatatableJs.lib.Data) {throw new global.DatatableJs.lib.Exception('"data" must be an instance of DatatableJs.lib.Data');}
+		if (!(data instanceof global.DatatableJs.lib.Data)) {throw new global.DatatableJs.lib.Exception('"data" must be an instance of DatatableJs.lib.Data');}
 		this._data = data;
+		return this;
+	};
+
+	/**
+	 * Get the current set of data rows from the local DatatableJs.lib.Data
+	 * @return {Array}
+	 */
+	Filter.prototype.getRows = function() {
+		return this.getData().getRows();
+	};
+
+	/**
+	 * Set the current DatatableJs.lib.Data reference
+	 * @param  {DatatableJs.lib.Data}   data
+	 * @return {DatatableJs.lib.Filter}
+	 */
+	Filter.prototype.setRows = function(rows) {
+		if (!(rows instanceof Array)) {throw new DatatableJs.lib.Exception('The data set must be an array of data rows');}
+		this.getData().setRows(rows);
 		return this;
 	};
 
@@ -160,7 +179,7 @@
 	 * @return {DatatableJs.lib.Filter}
 	 */
 	Filter.prototype.setSchema = function(schema) {
-		if (!schema instanceof global.DatatableJs.lib.Schema) {throw new global.DatatableJs.lib.Exception('"schema" must be an instance of DatatableJs.lib.Schema');}
+		if (!(schema instanceof global.DatatableJs.lib.Schema)) {throw new global.DatatableJs.lib.Exception('"schema" must be an instance of DatatableJs.lib.Schema');}
 		this._schema = schema;
 		return this;
 	};
@@ -174,9 +193,9 @@
 
 		// Filter rules
 		if (filter.fields && filter.comparators && filter.values) {
-			if (false === (filter.fields instanceof Array))      {filter.fields = [filter.fields];}
-			if (false === (filter.comparators instanceof Array)) {filter.comparators = [filter.comparators];}
-			if (false === (filter.values instanceof Array))      {filter.values = [filter.values];}
+			if (!(filter.fields instanceof Array))      {filter.fields = [filter.fields];}
+			if (!(filter.comparators instanceof Array)) {filter.comparators = [filter.comparators];}
+			if (!(filter.values instanceof Array))      {filter.values = [filter.values];}
 
 			this._filters.push({
 				  fields:      filter.fields
@@ -316,7 +335,7 @@
 	 */
 	Filter.prototype.next = function() {
 
-		if (this._iterator_key < this._data.getData().length) {this._iterator_key++;}
+		if (this._iterator_key < this.getRows().length) {this._iterator_key++;}
 		if (!this._is_executed) {this.execute();}
 		this._iterator_value = undefined;
 
@@ -328,11 +347,11 @@
 			max_page_row = (this._pagination.current_page * this._pagination.rows_per_page) - 1;
 		}
 
-		if (this._iterator_key < this._data.getData().length) {
-			for (var a = this._iterator_key; a < this._data.getData().length; a++) {
+		if (this._iterator_key < this.getRows().length) {
+			for (var a = this._iterator_key; a < this.getRows().length; a++) {
 
 				// Row matches current filters
-				if (this._data.getData()[a] && this.rowMatches(this._data.getData()[a])) {
+				if (this.getRows()[a] && this.rowMatches(this.getRows()[a])) {
 
 					// Check to see if the row is in the current page
 					var in_page = false;
@@ -347,8 +366,8 @@
 					// If not paginated or in the current page, return row
 					if (!this._pagination.enabled || in_page) {
 						this._iterator_key   = a;
-						this._iterator_value = this._data.getData()[a];
-						this._cur_value      = this._data.getData()[a];
+						this._iterator_value = this.getRows()[a];
+						this._cur_value      = this.getRows()[a];
 						break;
 					}
 				}
@@ -394,7 +413,7 @@
 			for (var a = this._iterator_key; a > -1; a--) {
 
 				// Row matches current filters
-				if (this._data.getData()[a] && this.rowMatches(this._data.getData()[a])) {
+				if (this.getRows()[a] && this.rowMatches(this.getRows()[a])) {
 
 					// Check to see if the row is in the current page
 					var in_page;
@@ -409,8 +428,8 @@
 					// If not paginated or in the current page, return row
 					if (!this._pagination.enabled || in_page) {
 						this._iterator_key   = a;
-						this._iterator_value = this._data.getData()[a];
-						this._cur_value      = this._data.getData()[a];
+						this._iterator_value = this.getRows()[a];
+						this._cur_value      = this.getRows()[a];
 						break;
 					}
 				}
@@ -441,9 +460,9 @@
 			var filter_matches = false;
 			var filter = this._filters[a];
 
-			if (!filter.fields      instanceof Array) {filter.fields      = [filter.fields];}
-			if (!filter.comparators instanceof Array) {filter.comparators = [filter.comparators];}
-			if (!filter.values      instanceof Array) {filter.values      = [filter.values];}
+			if (!(filter.fields      instanceof Array)) {filter.fields      = [filter.fields];}
+			if (!(filter.comparators instanceof Array)) {filter.comparators = [filter.comparators];}
+			if (!(filter.values      instanceof Array)) {filter.values      = [filter.values];}
 
 			for (var b = 0; b < filter.fields.length; b++) {
 

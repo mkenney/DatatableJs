@@ -59,50 +59,68 @@
 	/**
 	 * Initialize
 	 *
-	 * @param  {DatatableJs.lib.Schema} schema Optional
-	 * @param  {DatatableJs.lib.Data}   data   Optional
+	 * @param  {DatatableJs.lib.Schema}     schema Optional
+	 * @param  {DatatableJs.lib.Data|Array} data   Optional
 	 * @return {DatatableJs}
 	 */
 	DatatableJs.prototype.init = function(args) {
 		if (undefined !== args.schema) {this.setSchema(args.schema);}
-		if (undefined !== args.data)   {this.setData(args.data);}
+		if (undefined !== args.data)   {
+			// Accept an array of data rows for convenience
+			if ((args.data instanceof Array)) {
+				var rows = args.data;
+				args.data = new this.lib.Data();
+				args.data.setSchema(this.getSchema());
+				args.data.setRows(rows);
+			}
+			this.setData(args.data);
+		}
 		return this;
 	};
 
 	/**
-	 * Get the current data object
+	 * Get the current DatatableJs.lib.Data instance
 	 *
 	 * If an instance doesn't exist or is invalid one will be created
 	 *
 	 * @return {DatatableJs.lib.Data}
 	 */
 	DatatableJs.prototype.getData = function() {
-		if (!this._data instanceof this.lib.Data) {this._data = new this.lib.Data();}
+		if (!(this._data instanceof this.lib.Data)) {this._data = new this.lib.Data();}
 		return this._data;
 	};
 
 	/**
-	 * Store a data object or import a set of data rows
+	 * Set the local DatatableJs.lib.Data instance
 	 *
-	 * @param  {DatatableJs.lib.Data|Array} data
+	 * @param  {DatatableJs.lib.Data} data
 	 * @return {DatatableJs}
 	 */
 	DatatableJs.prototype.setData = function(data) {
-		if (undefined !== data) {
-			var data_obj = new this.lib.Data();
+		if (!(data instanceof DatatableJs.lib.Data)) {throw new DatatableJs.lib.Exception('The data definition must be an instance of DatatableJs.lib.Data');}
+		this._data = data;
+		return this;
+	};
 
-			if (data instanceof this.lib.Data) {
-				data_obj = data;
-				data = data_obj.getData();
+	/**
+	 * Get the current set of data rows
+	 *
+	 * @return {Array}
+	 */
+	DatatableJs.prototype.getRows = function() {
+		if (!(this._data instanceof this.lib.Data)) {this._data = new this.lib.Data();}
+		return this._data;
+	};
 
-			} else if (!data instanceof Array) {
-				throw new DatatableJs.lib.Exception('The data definition must be an instance of DatatableJs.lib.Data or an array of data rows');
-			}
-
-			data_obj.setSchema(this.getSchema());
-			data_obj.setData(data);
-			this._data = data_obj;
-		}
+	/**
+	 * Replace the current data set with an array of data rows
+	 *
+	 * @param  {Array} rows
+	 * @return {DatatableJs}
+	 */
+	DatatableJs.prototype.setRows = function(rows) {
+		if (!(rows instanceof Array)) {throw new DatatableJs.lib.Exception('The data definition must be an array of data rows');}
+		this.getData().setRows(rows);
 		return this;
 	};
 
@@ -114,7 +132,7 @@
 	 * @return {DatatableJs.lib.Schema}
 	 */
 	DatatableJs.prototype.getSchema = function() {
-		if (false === (this._schema instanceof this.lib.Schema)) {
+		if (!(this._schema instanceof this.lib.Schema)) {
 			this._schema = new this.lib.Schema();
 		}
 		return this._schema;
@@ -137,7 +155,7 @@
 			this._schema = schema;
 
 			// re-evaluate rows
-			if (this._data instanceof DatatableJs.lib.Data) {
+			if ((this._data instanceof DatatableJs.lib.Data)) {
 				this._data.setSchema(schema);
 			}
 		}
@@ -150,7 +168,7 @@
 	 * @param {[type]} schema [description]
 	 */
 	DatatableJs.prototype.createFilter = function() {
-		return new this.lib.Filter(this._data, this._schema);
+		return new this.lib.Filter(this.getData(), this.getSchema());
 	};
 
 	global.DatatableJs = DatatableJs;

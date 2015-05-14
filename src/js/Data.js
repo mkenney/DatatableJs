@@ -47,8 +47,8 @@
 	 * @return {DatatableJs.lib.Data}
 	 */
 	Data.prototype.init = function(rows) {
-		if (undefined !== rows && rows instanceof Array) {
-			this.setData(rows);
+		if (undefined !== rows && (rows instanceof Array)) {
+			this.setRows(rows);
 		}
 		return this;
 	};
@@ -58,7 +58,7 @@
 	 *
 	 * @return  {Array}
 	 */
-	Data.prototype.getData = function() {
+	Data.prototype.getRows = function() {
 		if (!(this._rows instanceof Array)) {this._rows = [];}
 		return this._rows;
 	};
@@ -68,9 +68,8 @@
 	 * @param  {Array} rows
 	 * @return {DatatableJs.lib.Data}
 	 */
-	Data.prototype.setData = function(rows) {
-		if (!rows instanceof Array) {throw new global.DatatableJs.lib.Exception('Data must be an array objects representing rows');}
-
+	Data.prototype.setRows = function(rows) {
+		if (!(rows instanceof Array)) {throw new global.DatatableJs.lib.Exception('Data must be an array objects representing rows');}
 		this.truncate();
 		this._current_sort_column    = undefined;
 		this._current_sort_direction = undefined;
@@ -82,8 +81,8 @@
 		}
 
 		if (0 === row_key)                              {global.console.info('DatatableJs - No data rows found');}
-		if (0 === this.getData().length && row_key > 0) {global.console.info('DatatableJs - No valid data rows found');}
-		if (this.getData().length < row_key)            {global.console.info('DatatableJs - '+(row_key - this.getData().length)+' of '+row_key+' data rows were invalid');}
+		if (0 === this.getRows().length && row_key > 0) {global.console.info('DatatableJs - No valid data rows found');}
+		if (this.getRows().length < row_key)            {global.console.info('DatatableJs - '+(row_key - this.getRows().length)+' of '+row_key+' data rows were invalid');}
 
 		return this;
 	};
@@ -99,7 +98,7 @@
 		if (0 === Object.keys(row).length) {global.console.warn('DatatableJs - An attempt to insert an empty data row rejected');}
 
 		var is_valid_row = true;
-		if (this.getSchema() instanceof global.DatatableJs.lib.Schema) {
+		if ((this.getSchema() instanceof global.DatatableJs.lib.Schema)) {
 			is_valid_row = this.getSchema().isValidRow(row);
 		}
 
@@ -143,11 +142,12 @@
 	 */
 	Data.prototype.setSchema = function(schema) {
 		if (!(schema instanceof global.DatatableJs.lib.Schema)) {throw new global.DatatableJs.lib.Exception('"schema" must be an instance of DatatableJs.lib.Schema');}
-		var current_data = this.getData();
+		var current_data = this.getRows();
 		this.truncate();
 		this._schema = schema;
 		if (current_data.length) {
-			this.setData(current_data); // This will re-validate current rows against the schema
+console.log('got here'); throw stop;
+			this.setRows(current_data); // This will re-validate current rows against the schema
 		}
 		return this;
 	};
@@ -216,24 +216,26 @@
 			}
 
 			// If a schema definition exists, look for sort options
-			if (this.getSchema().getColumn(column) instanceof global.DatatableJs.lib.Column) {
+			if ((this.getSchema() instanceof global.DatatableJs.lib.Schema)) {
+				if ((this.getSchema().getColumn(column) instanceof global.DatatableJs.lib.Column)) {
 
-				if ('function' === typeof this.getSchema().getColumn(column).get('sort_transformer')) {
-					transformer = this.getSchema().getColumn(column).get('sort_transformer');
-				}
+					if ('function' === typeof this.getSchema().getColumn(column).get('sort_transformer')) {
+						transformer = this.getSchema().getColumn(column).get('sort_transformer');
+					}
 
-				if ('function' === typeof this.getSchema().getColumn(column).get('sort_comparator')) {
-					comparator = this.getSchema().getColumn(column).get('sort_comparator');
-				}
+					if ('function' === typeof this.getSchema().getColumn(column).get('sort_comparator')) {
+						comparator = this.getSchema().getColumn(column).get('sort_comparator');
+					}
 
-				// If a direction isn't yet defined, see if a default sort order is
-				// specified in the column schema
-				if ('string' !== typeof direction) {
-					if (this.getSchema().getColumn(column).get('sort_direction')) {
-						direction = ('desc' === this.getSchema().getColumn(column).get('sort_direction')
-							? 'desc'
-							: 'asc'
-						);
+					// If a direction isn't yet defined, see if a default sort order is
+					// specified in the column schema
+					if ('string' !== typeof direction) {
+						if (this.getSchema().getColumn(column).get('sort_direction')) {
+							direction = ('desc' === this.getSchema().getColumn(column).get('sort_direction')
+								? 'desc'
+								: 'asc'
+							);
+						}
 					}
 				}
 			}

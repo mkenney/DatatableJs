@@ -351,7 +351,7 @@ while (row = filter.next()) {
 22 1 1
 ```
 
-Example 6: All of the filter rules can be commbined in any way
+Example 6: All of the filter rules can be combined in any way
 ```javascript
 var datatable = new DatatableJs({
     data: sample_data
