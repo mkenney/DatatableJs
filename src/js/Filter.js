@@ -160,7 +160,7 @@
 	 * @return {DatatableJs.lib.Filter}
 	 */
 	Filter.prototype.setRows = function(rows) {
-		if (!(rows instanceof Array)) {throw new DatatableJs.lib.Exception('The data set must be an array of data rows');}
+		if (!(rows instanceof Array)) {throw new global.DatatableJs.lib.Exception('The data set must be an array of data rows');}
 		this.getData().setRows(rows);
 		return this;
 	};

@@ -146,7 +146,6 @@
 		this.truncate();
 		this._schema = schema;
 		if (current_data.length) {
-console.log('got here'); throw stop;
 			this.setRows(current_data); // This will re-validate current rows against the schema
 		}
 		return this;

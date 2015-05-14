@@ -66,50 +66,68 @@
 	/**
 	 * Initialize
 	 *
-	 * @param  {DatatableJs.lib.Schema} schema Optional
-	 * @param  {DatatableJs.lib.Data}   data   Optional
+	 * @param  {DatatableJs.lib.Schema}     schema Optional
+	 * @param  {DatatableJs.lib.Data|Array} data   Optional
 	 * @return {DatatableJs}
 	 */
 	DatatableJs.prototype.init = function(args) {
 		if (undefined !== args.schema) {this.setSchema(args.schema);}
-		if (undefined !== args.data)   {this.setData(args.data);}
+		if (undefined !== args.data)   {
+			// Accept an array of data rows for convenience
+			if ((args.data instanceof Array)) {
+				var rows = args.data;
+				args.data = new this.lib.Data();
+				args.data.setSchema(this.getSchema());
+				args.data.setRows(rows);
+			}
+			this.setData(args.data);
+		}
 		return this;
 	};
 
 	/**
-	 * Get the current data object
+	 * Get the current DatatableJs.lib.Data instance
 	 *
 	 * If an instance doesn't exist or is invalid one will be created
 	 *
 	 * @return {DatatableJs.lib.Data}
 	 */
 	DatatableJs.prototype.getData = function() {
-		if (!this._data instanceof this.lib.Data) {this._data = new this.lib.Data();}
+		if (!(this._data instanceof this.lib.Data)) {this._data = new this.lib.Data();}
 		return this._data;
 	};
 
 	/**
-	 * Store a data object or import a set of data rows
+	 * Set the local DatatableJs.lib.Data instance
 	 *
-	 * @param  {DatatableJs.lib.Data|Array} data
+	 * @param  {DatatableJs.lib.Data} data
 	 * @return {DatatableJs}
 	 */
 	DatatableJs.prototype.setData = function(data) {
-		if (undefined !== data) {
-			var data_obj = new this.lib.Data();
+		if (!(data instanceof DatatableJs.lib.Data)) {throw new DatatableJs.lib.Exception('The data definition must be an instance of DatatableJs.lib.Data');}
+		this._data = data;
+		return this;
+	};
 
-			if (data instanceof this.lib.Data) {
-				data_obj = data;
-				data = data_obj.getData();
+	/**
+	 * Get the current set of data rows
+	 *
+	 * @return {Array}
+	 */
+	DatatableJs.prototype.getRows = function() {
+		if (!(this._data instanceof this.lib.Data)) {this._data = new this.lib.Data();}
+		return this._data;
+	};
 
-			} else if (!data instanceof Array) {
-				throw new DatatableJs.lib.Exception('The data definition must be an instance of DatatableJs.lib.Data or an array of data rows');
-			}
-
-			data_obj.setSchema(this.getSchema());
-			data_obj.setData(data);
-			this._data = data_obj;
-		}
+	/**
+	 * Replace the current data set with an array of data rows
+	 *
+	 * @param  {Array} rows
+	 * @return {DatatableJs}
+	 */
+	DatatableJs.prototype.setRows = function(rows) {
+		if (!(rows instanceof Array)) {throw new DatatableJs.lib.Exception('The data definition must be an array of data rows');}
+		this.getData().setRows(rows);
 		return this;
 	};
 
@@ -121,7 +139,7 @@
 	 * @return {DatatableJs.lib.Schema}
 	 */
 	DatatableJs.prototype.getSchema = function() {
-		if (false === (this._schema instanceof this.lib.Schema)) {
+		if (!(this._schema instanceof this.lib.Schema)) {
 			this._schema = new this.lib.Schema();
 		}
 		return this._schema;
@@ -144,7 +162,7 @@
 			this._schema = schema;
 
 			// re-evaluate rows
-			if (this._data instanceof DatatableJs.lib.Data) {
+			if ((this._data instanceof DatatableJs.lib.Data)) {
 				this._data.setSchema(schema);
 			}
 		}
@@ -157,7 +175,7 @@
 	 * @param {[type]} schema [description]
 	 */
 	DatatableJs.prototype.createFilter = function() {
-		return new this.lib.Filter(this._data, this._schema);
+		return new this.lib.Filter(this.getData(), this.getSchema());
 	};
 
 	global.DatatableJs = DatatableJs;
@@ -573,8 +591,8 @@
 	 * @return {DatatableJs.lib.Data}
 	 */
 	Data.prototype.init = function(rows) {
-		if (undefined !== rows && rows instanceof Array) {
-			this.setData(rows);
+		if (undefined !== rows && (rows instanceof Array)) {
+			this.setRows(rows);
 		}
 		return this;
 	};
@@ -584,7 +602,7 @@
 	 *
 	 * @return  {Array}
 	 */
-	Data.prototype.getData = function() {
+	Data.prototype.getRows = function() {
 		if (!(this._rows instanceof Array)) {this._rows = [];}
 		return this._rows;
 	};
@@ -594,9 +612,8 @@
 	 * @param  {Array} rows
 	 * @return {DatatableJs.lib.Data}
 	 */
-	Data.prototype.setData = function(rows) {
-		if (!rows instanceof Array) {throw new global.DatatableJs.lib.Exception('Data must be an array of row objects');}
-
+	Data.prototype.setRows = function(rows) {
+		if (!(rows instanceof Array)) {throw new global.DatatableJs.lib.Exception('Data must be an array objects representing rows');}
 		this.truncate();
 		this._current_sort_column    = undefined;
 		this._current_sort_direction = undefined;
@@ -607,9 +624,9 @@
 			this.addRow(rows[row_key]);
 		}
 
-		if (0 === row_key)                              {window.console.info('DatatableJs - No data rows found');}
-		if (0 === this.getData().length && row_key > 0) {window.console.warn('DatatableJs - No valid data rows found');}
-		if (this.getData().length < row_key)            {window.console.warn('DatatableJs - '+(row_key - this.getData().length)+' of '+row_key+' data rows were invalid');}
+		if (0 === row_key)                              {global.console.info('DatatableJs - No data rows found');}
+		if (0 === this.getRows().length && row_key > 0) {global.console.info('DatatableJs - No valid data rows found');}
+		if (this.getRows().length < row_key)            {global.console.info('DatatableJs - '+(row_key - this.getRows().length)+' of '+row_key+' data rows were invalid');}
 
 		return this;
 	};
@@ -622,10 +639,10 @@
 	 */
 	Data.prototype.addRow = function(row) {
 		if ('object' !== typeof row)       {throw new global.DatatableJs.lib.Exception('Row data must be a simple object');}
-		if (0 === Object.keys(row).length) {window.console.warn('DatatableJs - An attempt to insert an empty data row rejected');}
+		if (0 === Object.keys(row).length) {global.console.warn('DatatableJs - An attempt to insert an empty data row rejected');}
 
 		var is_valid_row = true;
-		if (this.getSchema() instanceof global.DatatableJs.lib.Schema) {
+		if ((this.getSchema() instanceof global.DatatableJs.lib.Schema)) {
 			is_valid_row = this.getSchema().isValidRow(row);
 		}
 
@@ -669,11 +686,11 @@
 	 */
 	Data.prototype.setSchema = function(schema) {
 		if (!(schema instanceof global.DatatableJs.lib.Schema)) {throw new global.DatatableJs.lib.Exception('"schema" must be an instance of DatatableJs.lib.Schema');}
-		var current_data = this.getData();
+		var current_data = this.getRows();
 		this.truncate();
 		this._schema = schema;
 		if (current_data.length) {
-			this.setData(current_data); // This will re-validate current rows against the schema
+			this.setRows(current_data); // This will re-validate current rows against the schema
 		}
 		return this;
 	};
@@ -742,24 +759,26 @@
 			}
 
 			// If a schema definition exists, look for sort options
-			if (this.getSchema().getColumn(column) instanceof global.DatatableJs.lib.Column) {
+			if ((this.getSchema() instanceof global.DatatableJs.lib.Schema)) {
+				if ((this.getSchema().getColumn(column) instanceof global.DatatableJs.lib.Column)) {
 
-				if ('function' === typeof this.getSchema().getColumn(column).get('sort_transformer')) {
-					transformer = this.getSchema().getColumn(column).get('sort_transformer');
-				}
+					if ('function' === typeof this.getSchema().getColumn(column).get('sort_transformer')) {
+						transformer = this.getSchema().getColumn(column).get('sort_transformer');
+					}
 
-				if ('function' === typeof this.getSchema().getColumn(column).get('sort_comparator')) {
-					comparator = this.getSchema().getColumn(column).get('sort_comparator');
-				}
+					if ('function' === typeof this.getSchema().getColumn(column).get('sort_comparator')) {
+						comparator = this.getSchema().getColumn(column).get('sort_comparator');
+					}
 
-				// If a direction isn't yet defined, see if a default sort order is
-				// specified in the column schema
-				if ('string' !== typeof direction) {
-					if (this.getSchema().getColumn(column).get('sort_direction')) {
-						direction = ('desc' === this.getSchema().getColumn(column).get('sort_direction')
-							? 'desc'
-							: 'asc'
-						);
+					// If a direction isn't yet defined, see if a default sort order is
+					// specified in the column schema
+					if ('string' !== typeof direction) {
+						if (this.getSchema().getColumn(column).get('sort_direction')) {
+							direction = ('desc' === this.getSchema().getColumn(column).get('sort_direction')
+								? 'desc'
+								: 'asc'
+							);
+						}
 					}
 				}
 			}
@@ -964,7 +983,7 @@
 
 	/**
 	 * Get the current DatatableJs.lib.Data reference
-	 * @return {Array}
+	 * @return {DatatableJs.lib.Data}
 	 */
 	Filter.prototype.getData = function() {
 		return this._data;
@@ -976,8 +995,27 @@
 	 * @return {DatatableJs.lib.Filter}
 	 */
 	Filter.prototype.setData = function(data) {
-		if (!data instanceof global.DatatableJs.lib.Data) {throw new global.DatatableJs.lib.Exception('"data" must be an instance of DatatableJs.lib.Data');}
+		if (!(data instanceof global.DatatableJs.lib.Data)) {throw new global.DatatableJs.lib.Exception('"data" must be an instance of DatatableJs.lib.Data');}
 		this._data = data;
+		return this;
+	};
+
+	/**
+	 * Get the current set of data rows from the local DatatableJs.lib.Data
+	 * @return {Array}
+	 */
+	Filter.prototype.getRows = function() {
+		return this.getData().getRows();
+	};
+
+	/**
+	 * Set the current DatatableJs.lib.Data reference
+	 * @param  {DatatableJs.lib.Data}   data
+	 * @return {DatatableJs.lib.Filter}
+	 */
+	Filter.prototype.setRows = function(rows) {
+		if (!(rows instanceof Array)) {throw new global.DatatableJs.lib.Exception('The data set must be an array of data rows');}
+		this.getData().setRows(rows);
 		return this;
 	};
 
@@ -995,7 +1033,7 @@
 	 * @return {DatatableJs.lib.Filter}
 	 */
 	Filter.prototype.setSchema = function(schema) {
-		if (!schema instanceof global.DatatableJs.lib.Schema) {throw new global.DatatableJs.lib.Exception('"schema" must be an instance of DatatableJs.lib.Schema');}
+		if (!(schema instanceof global.DatatableJs.lib.Schema)) {throw new global.DatatableJs.lib.Exception('"schema" must be an instance of DatatableJs.lib.Schema');}
 		this._schema = schema;
 		return this;
 	};
@@ -1009,9 +1047,9 @@
 
 		// Filter rules
 		if (filter.fields && filter.comparators && filter.values) {
-			if (false === (filter.fields instanceof Array))      {filter.fields = [filter.fields];}
-			if (false === (filter.comparators instanceof Array)) {filter.comparators = [filter.comparators];}
-			if (false === (filter.values instanceof Array))      {filter.values = [filter.values];}
+			if (!(filter.fields instanceof Array))      {filter.fields = [filter.fields];}
+			if (!(filter.comparators instanceof Array)) {filter.comparators = [filter.comparators];}
+			if (!(filter.values instanceof Array))      {filter.values = [filter.values];}
 
 			this._filters.push({
 				  fields:      filter.fields
@@ -1021,7 +1059,7 @@
 
 		// Rule rejected
 		} else {
-			window.console.error('DatatableJs - An invalid filter definition was rejected', filter);
+			global.console.error('DatatableJs - An invalid filter definition was rejected', filter);
 		}
 
 		return this;
@@ -1045,7 +1083,7 @@
 
 		// Rule rejected
 		} else {
-			window.console.error('DatatableJs - An invalid sort definition was rejected', sort);
+			global.console.error('DatatableJs - An invalid sort definition was rejected', sort);
 		}
 
 		return this;
@@ -1151,7 +1189,7 @@
 	 */
 	Filter.prototype.next = function() {
 
-		if (this._iterator_key < this._data.getData().length) {this._iterator_key++;}
+		if (this._iterator_key < this.getRows().length) {this._iterator_key++;}
 		if (!this._is_executed) {this.execute();}
 		this._iterator_value = undefined;
 
@@ -1163,11 +1201,11 @@
 			max_page_row = (this._pagination.current_page * this._pagination.rows_per_page) - 1;
 		}
 
-		if (this._iterator_key < this._data.getData().length) {
-			for (var a = this._iterator_key; a < this._data.getData().length; a++) {
+		if (this._iterator_key < this.getRows().length) {
+			for (var a = this._iterator_key; a < this.getRows().length; a++) {
 
 				// Row matches current filters
-				if (this._data.getData()[a] && this.rowMatches(this._data.getData()[a])) {
+				if (this.getRows()[a] && this.rowMatches(this.getRows()[a])) {
 
 					// Check to see if the row is in the current page
 					var in_page = false;
@@ -1182,8 +1220,8 @@
 					// If not paginated or in the current page, return row
 					if (!this._pagination.enabled || in_page) {
 						this._iterator_key   = a;
-						this._iterator_value = this._data.getData()[a];
-						this._cur_value      = this._data.getData()[a];
+						this._iterator_value = this.getRows()[a];
+						this._cur_value      = this.getRows()[a];
 						break;
 					}
 				}
@@ -1229,7 +1267,7 @@
 			for (var a = this._iterator_key; a > -1; a--) {
 
 				// Row matches current filters
-				if (this._data.getData()[a] && this.rowMatches(this._data.getData()[a])) {
+				if (this.getRows()[a] && this.rowMatches(this.getRows()[a])) {
 
 					// Check to see if the row is in the current page
 					var in_page;
@@ -1244,8 +1282,8 @@
 					// If not paginated or in the current page, return row
 					if (!this._pagination.enabled || in_page) {
 						this._iterator_key   = a;
-						this._iterator_value = this._data.getData()[a];
-						this._cur_value      = this._data.getData()[a];
+						this._iterator_value = this.getRows()[a];
+						this._cur_value      = this.getRows()[a];
 						break;
 					}
 				}
@@ -1276,9 +1314,9 @@
 			var filter_matches = false;
 			var filter = this._filters[a];
 
-			if (!filter.fields      instanceof Array) {filter.fields      = [filter.fields];}
-			if (!filter.comparators instanceof Array) {filter.comparators = [filter.comparators];}
-			if (!filter.values      instanceof Array) {filter.values      = [filter.values];}
+			if (!(filter.fields      instanceof Array)) {filter.fields      = [filter.fields];}
+			if (!(filter.comparators instanceof Array)) {filter.comparators = [filter.comparators];}
+			if (!(filter.values      instanceof Array)) {filter.values      = [filter.values];}
 
 			for (var b = 0; b < filter.fields.length; b++) {
 
