@@ -64,7 +64,8 @@ located in the `DatatableJs.lib` namespace:
 var schema = new DatatableJs.lib.Schema();
 ```
 
-DatatableJs API:
+### DatatableJs API:
+
 ```javascript
 /**
  * Get the current DatatableJs.lib.Data instance
@@ -123,7 +124,8 @@ DatatableJs.prototype.setSchema
 DatatableJs.prototype.createFilter
 ```
 
-DatatableJs.lib.Schema API:
+### DatatableJs.lib.Schema API:
+
 ```javascript
 /**
  * Get current column definitions
@@ -187,7 +189,8 @@ Schema.prototype.isValidRow
 Schema.prototype.isValidData
 ```
 
-DatatableJs.lib.Column API:
+### DatatableJs.lib.Column API:
+
 ```javascript
 /**
  * Get a column property
@@ -222,7 +225,8 @@ Column.prototype.getDefinition
 Column.prototype.setDefinition
 ```
 
-DatatableJs.lib.Data API:
+### DatatableJs.lib.Data API:
+
 ```javascript
 /**
  * Get the current set of data rows
@@ -294,7 +298,8 @@ Data.prototype.sort
 Data.prototype.truncate
 ```
 
-DatatableJs.lib.Filter API:
+### DatatableJs.lib.Filter API:
+
 ```javascript
 /**
  * Get the current DatatableJs.lib.Data instance
