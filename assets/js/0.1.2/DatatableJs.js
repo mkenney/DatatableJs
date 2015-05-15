@@ -4,8 +4,6 @@
  * Licensed under MIT (https://github.com/mkenney/DatatableJs/blob/master/LICENSE)
  */
 
-
-
 +function(global, undefined) {
 	'use strict';
 

@@ -17,7 +17,8 @@ module.exports = function (grunt) {
 
 		// Metadata
 		  pkg: grunt.file.readJSON('package.json')
-		, banner: '/*!\n'
+		, banner:
+		      '/*!\n'
 			+ ' * DatatableJs v<%= pkg.version %> (<%= pkg.homepage %>)\n'
 			+ ' * Copyright 2014-<%= grunt.template.today("yyyy") %> <%= pkg.author %>\n'
 			+ ' * Licensed under <%= pkg.license.type %> (<%= pkg.license.url %>)\n'
@@ -25,7 +26,7 @@ module.exports = function (grunt) {
 
 		// Task configuration
 		, clean: {
-			dist: 'assets'
+			dist: 'assets/js/<%= pkg.version %>'
 		}
 
 		, jshint: {
@@ -57,7 +58,7 @@ module.exports = function (grunt) {
 
 		, concat: {
 			options: {
-				  banner: '<%= banner %>\n<%= jqueryCheck %>\n<%= jqueryVersionCheck %>'
+				  banner: '<%= banner %>'
 				, stripBanners: false
 			}
 			, bootstrap: {
@@ -109,7 +110,7 @@ module.exports = function (grunt) {
 	grunt.registerTask('lint', ['jshint:grunt', 'jscs:grunt', 'jshint:core', 'jscs:core']);
 
 	// Full distribution task.
-	grunt.registerTask('dist', ['lint', 'concat', 'uglify']);
+	grunt.registerTask('dist', ['lint', 'clean', 'concat', 'uglify']);
 
 	// Default task.
 	grunt.registerTask('default', ['dist']);
