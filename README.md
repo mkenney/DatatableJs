@@ -7,7 +7,7 @@ interface elements as well as tabular data.
 This implements a stable sort hack to allow for multi-column sort operations using
 the native sorting algorithm, I did not implement a sort in the code.  Instead, I
 create a position flag on the row objects.  As a result, `__pos__` is a "reserved"
-column name and any data stored there be overwritten.
+column name and any data stored there will be overwritten.
 
 ## Table of contents
 
