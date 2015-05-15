@@ -70,7 +70,7 @@ module.exports = function (grunt) {
 					, 'src/js/Data.js'
 					, 'src/js/Filter.js'
 				]
-				, dest: 'assets/js/<%= pkg.name %>.js'
+				, dest: 'assets/js/<%= pkg.version %>/<%= pkg.name %>.js'
 			}
 		}
 
@@ -78,14 +78,14 @@ module.exports = function (grunt) {
 			options: {
 				  preserveComments: 'some'
 				, sourceMap: true
-				, sourceMapName: 'assets/js/<%= pkg.name %>.map'
+				, sourceMapName: 'assets/js/<%= pkg.version %>/<%= pkg.name %>.map'
 				, compress: {
 					drop_console: true
 				}
 			}
 			, core: {
 				  src: '<%= concat.bootstrap.dest %>'
-				, dest: 'assets/js/<%= pkg.name %>.min.js'
+				, dest: 'assets/js/<%= pkg.version %>/<%= pkg.name %>.min.js'
 			}
 		}
 
@@ -109,7 +109,7 @@ module.exports = function (grunt) {
 	grunt.registerTask('lint', ['jshint:grunt', 'jscs:grunt', 'jshint:core', 'jscs:core']);
 
 	// Full distribution task.
-	grunt.registerTask('dist', ['lint', 'clean', 'concat', 'uglify']);
+	grunt.registerTask('dist', ['lint', 'concat', 'uglify']);
 
 	// Default task.
 	grunt.registerTask('default', ['dist']);
