@@ -274,7 +274,7 @@
 	 * @return {DatatableJs.lib.Filter}
 	 */
 	Filter.prototype.setSortRules = function(sort_rules) {
-		if (!(sort_rules instanceof Array)) {throw new DatatableJs.lib.Exception('Sort rules must be an array of valid rule definition objects');}
+		if (!(sort_rules instanceof Array)) {throw new global.DatatableJs.lib.Exception('Sort rules must be an array of valid rule definition objects');}
 
 		this.clearSortRules();
 		for (var a = 0; a < sort_rules.length; a++) {
