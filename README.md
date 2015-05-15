@@ -351,6 +351,23 @@ while (row = filter.next()) {
 22 1 1
 ```
 
+To iterate through the next (or any) page re-execute the filter with a page option:
+```
+filter.execute({page: 3})
+while (row = filter.next()) {
+    console.log(row.id, row.col1, row.col2);
+}
+
+// OUTPUT:
+23 2 0
+24 0 1
+25 1 0
+26 2 1
+27 0 0
+28 1 1
+29 2 0
+```
+
 Example 6: All of the filter rules can be combined in any way
 ```javascript
 var datatable = new DatatableJs({
@@ -485,6 +502,289 @@ DatatableJs - 3 of 27 data rows were invalid
 26 2 1
 16 2 1
 ```
+
+DatatableJs API:
+```javascript
+/**
+ * Get the current DatatableJs.lib.Data instance
+ *
+ * If an instance doesn't exist or is invalid one will be created
+ *
+ * @return {DatatableJs.lib.Data}
+ */
+DatatableJs.prototype.getData
+
+/**
+ * Set the current DatatableJs.lib.Data instance
+ *
+ * @param  {DatatableJs.lib.Data} data
+ * @return {DatatableJs}
+ */
+DatatableJs.prototype.setData
+
+/**
+ * Get the current set of data rows
+ *
+ * @return {Array}
+ */
+DatatableJs.prototype.getRows
+
+/**
+ * Replace the current data set with an array of data rows
+ *
+ * @param  {Array} rows
+ * @return {DatatableJs}
+ */
+DatatableJs.prototype.setRows
+
+/**
+ * Get the current DatatableJs.lib.Schema instance
+ *
+ * If an instance doesn't exist or is invalid one will be created
+ *
+ * @return {DatatableJs.lib.Schema}
+ */
+DatatableJs.prototype.getSchema
+
+/**
+ * Set the current DatatableJs.lib.Schema instance
+ *
+ * @param  {DatatableJs.lib.Schema} schema
+ * @return {DatatableJs}
+ */
+DatatableJs.prototype.setSchema
+
+/**
+ * Generate a filter instance linked to the current schema and data references
+ *
+ * @return {DatatableJs.lib.Schema}
+ */
+DatatableJs.prototype.createFilter
+```
+
+DatatableJs.lib.Schema API:
+```javascript
+/**
+ * Get current column definitions
+ *
+ * @return {Object}
+ */
+Schema.prototype.getColumns
+
+/**
+ * Set or extend current column definitions
+ *
+ * This does not replace the current column definitions, it only extends and
+ * updates
+ *
+ * @param  {Array} columns An array of column definition objects
+ * @return {DatatableJs.lib.Schema}
+ */
+Schema.prototype.setColumns
+
+/**
+ * Get a column definition by name
+ *
+ * @param  {String} column_name
+ * @return {Object|undefined} The schema definition for the specified column, else undefined
+ */
+Schema.prototype.getColumn
+
+/**
+ * Delete a column definition by name
+ *
+ * @param  {String} column_name
+ * @return {DatatableJs.lib.Schema}
+ */
+Schema.prototype.deleteColumn
+
+/**
+ * Update or add a named column definition
+ *
+ * @param {String} column_name
+ * @param {Object} column_definition
+ * @return {DatatableJs.lib.Schema}
+ */
+Schema.prototype.setColumn
+
+/**
+ * Test a row of data to see if it meets requirements for this schema definition
+ *
+ * @param  {Object}  row A single data row
+ * @return {Boolean}
+ */
+Schema.prototype.isValidRow
+
+/**
+ * Test an individual piece of data to see if meets requirements for a specified
+ * column
+ *
+ * @param  {String}  column
+ * @param  {mixed}   value
+ * @return {Boolean}
+ */
+Schema.prototype.isValidData
+```
+
+DatatableJs.lib.Column API:
+```javascript
+/**
+ * Get a column property
+ *
+ * @param  {String} field
+ * @return {mixed}
+ */
+Column.prototype.get
+
+/**
+ * Set a column property
+ *
+ * @param  {String} field
+ * @param  {mixed}  value
+ * @return {DatatableJs.lib.Column}
+ */
+Column.prototype.set
+
+/**
+ * Get the full definition object for this column
+ *
+ * @return {Object}
+ */
+Column.prototype.getDefinition
+
+/**
+ * Extend the current column definition
+ *
+ * @param  {Object} column_definition
+ * @return {DatatableJs.lib.Column}
+ */
+Column.prototype.setDefinition
+```
+
+DatatableJs.lib.Data API:
+```javascript
+/**
+ * Get the current set of data rows
+ *
+ * @return  {Array}
+ */
+Data.prototype.getRows
+
+/**
+ * Replace the current data set with an array of data rows
+ *
+ * @param  {Array} rows
+ * @return {DatatableJs.lib.Data}
+ */
+Data.prototype.setRows
+
+/**
+ * Add a row to the current dataset
+ *
+ * If a schema is available, validate the row data.  Add support properties for
+ * the stable sort implementation.
+ *
+ * @param  {Object} row
+ * @return {DatatableJs.lib.Data}
+ */
+Data.prototype.addRow
+
+/**
+ * Get the current DatatableJs.lib.Schema instance
+ *
+ * If an instance doesn't exist or is invalid one will be created
+ *
+ * @return {DatatableJs.lib.Schema}
+ */
+Data.prototype.getSchema
+
+/**
+ * Set the current DatatableJs.lib.Schema instance
+ *
+ * @param  {DatatableJs.lib.Schema} schema
+ * @return {DatatableJs.lib.Data}
+ */
+Data.prototype.setSchema
+
+/**
+ * Sort the data.
+ *
+ * This implements a stable multi-sort algorithm
+ *
+ * @param  {String}          column      The column to sort on
+ * @param  {String}          direction   Optional, the sort direction, either
+ *                                       'asc' or 'desc'
+ * @param  {Function|String} comparator  Optional, a method to use when comparing
+ *                                       values for sorting
+ *                                           - function(a, b) {} // A custom comparison function that
+ *                                                               // compares two values for a match,
+ *                                                               // return -1, 0 or 1
+ * @param  {Function}        transformer A function to use to transform values prior to the sort
+ *                                       comparison (stripping HTML, typecasting, etc.)
+ * @return {DatatableJs.lib.Data}
+ */
+Data.prototype.sort
+
+/**
+ * Empty the data set by setting the data rows to an empty array and unsetting sort flags
+ *
+ * @return {DatatableJs.lib.Data}
+ */
+Data.prototype.truncate
+```
+
+DatatableJs.lib.Filter API:
+```javascript
+/**
+ * Get the current DatatableJs.lib.Data instance
+ *
+ * If an instance doesn't exist or is invalid one will be created
+ *
+ * @return {DatatableJs.lib.Data}
+ */
+Filter.prototype.getData
+
+/**
+ * Set the current DatatableJs.lib.Data reference
+ *
+ * @param  {DatatableJs.lib.Data}   data
+ * @return {DatatableJs.lib.Filter}
+ */
+Filter.prototype.setData
+
+/**
+ * Get the current set of data rows
+ *
+ * @return {Array}
+ */
+Filter.prototype.getRows
+
+/**
+ * Replace the current data set with an array of data rows
+ *
+ * @param  {Array} rows
+ * @return {DatatableJs.lib.Filter}
+ */
+Filter.prototype.setRows
+
+/**
+ * Get the current DatatableJs.lib.Schema instance
+ *
+ * If an instance doesn't exist or is invalid one will be created
+ *
+ * @return {DatatableJs.lib.Schema}
+ */
+Filter.prototype.getSchema
+
+/**
+ * Set the current DatatableJs.lib.Schema instance
+ *
+ * @param  {DatatableJs.lib.Schema} schema
+ * @return {DatatableJs.lib.Filter}
+ */
+Filter.prototype.setSchema
+```
+
 
 ## Contributing
 
