@@ -398,7 +398,7 @@ var sample_schema = {
     , col1: {
         sort_direction: 'asc'
     }
-    , col1: {
+    , col2: {
         nullable: true
         , sort_direction: 'asc'
     }
@@ -641,7 +641,7 @@ while (row = filter.next()) {
 ```
 
 To iterate through the next (or any) page re-execute the filter with a page option:
-```
+```javascript
 filter.execute({page: 3})
 while (row = filter.next()) {
     console.log(row.id, row.col1, row.col2);
