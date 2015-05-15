@@ -439,8 +439,10 @@ var sample_data = [
 ];
 ```
 
+### Example 1
 
-Example 1: Loop through the data
+Loop through the data
+
 ```javascript
 var datatable = new DatatableJs({data: sample_data});
 var filter = datatable.createFilter();
@@ -479,7 +481,10 @@ while (row = filter.next()) {
 // 29 2 0
 ```
 
-Example 2: Apply a data schema
+### Example 2
+
+Apply a data schema
+
 ```javascript
 var datatable = new DatatableJs({
     schema: sample_schema,
@@ -526,7 +531,10 @@ while (row = filter.next()) {
 // 29 2 0
 ```
 
-Example 3: Filter the data
+### Example 3
+
+Filter the data
+
 ```javascript
 var datatable = new DatatableJs({data: sample_data});
 var filter = datatable.createFilter();
@@ -561,7 +569,10 @@ while (row = filter.next()) {
 // 29 2 0
 ```
 
-Example 4: Sort the data
+### Example 4
+
+Sort the data
+
 ```javascript
 var datatable = new DatatableJs({data: sample_data});
 var filter = datatable.createFilter();
@@ -613,7 +624,10 @@ while (row = filter.next()) {
 // 5 1 null
 ```
 
-Example 5: Paginate the data
+### Example 5
+
+Paginate the data
+
 ```javascript
 var datatable = new DatatableJs({data: sample_data});
 var filter = datatable.createFilter();
@@ -657,7 +671,10 @@ while (row = filter.next()) {
 // 29 2 0
 ```
 
-Example 6: All of the filter rules can be combined in any way
+### Example 6
+
+All of the filter rules can be combined in any way
+
 ```javascript
 var datatable = new DatatableJs({
     data: sample_data
