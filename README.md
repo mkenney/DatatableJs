@@ -674,7 +674,7 @@ filter
         // A single field containing the data to filter on
         fields: 'id'
 
-        // A single comparison method, may be one of:
+        // One or more comparison functions. May be any of:
         //     '>'
         //     '>='
         //     '<'
@@ -683,8 +683,10 @@ filter
         //     '==='
         //     '!='
         //     '!=='
-        //     or a custom function comparing the data from the table to the values
-        //     defined here
+        //     function(data, value) {} // a custom function comparing the data
+        //                              // from the table to the values defined
+        //                              // below. Return false to reject rows
+        //                              // with the `data` value in them
         , comparators: '>'
 
         // A single value to compare the data with
@@ -707,7 +709,7 @@ filter
             // The first argument is a value from one of the listed fields and
             // the second is a value from the list of values
             , function(data, values) {   // By ignoring the values argument, I can make
-                return (1 === data % 2);   // this match all odd values as well as 2
+                return (1 === data % 2); // this match all odd values as well as 2
             }
         ]
 
@@ -734,7 +736,7 @@ filter
         // to compare and returns either -1, 0 or 1.
         //     -1 if a is less than b
         //     0 if a is equal to b
-        //     1 if a is greather than b
+        //     1 if a is greater than b
         // @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort
         , comparator: function(a, b) {
             if (a == b) {return 0;}
@@ -821,8 +823,8 @@ Guidelines for bug reports:
 2. **Check if the issue has been fixed** - try to reproduce it using the
      latest `master` branch in the repository
 
-3. **Isolate the problem** - ideally create a [reduced test
-     case](http://css-tricks.com/6263-reduced-test-cases/) and a [live example](http://jsfiddle.net/).
+3. **Isolate the problem** - ideally create a [reduced test case](http://css-tricks.com/6263-reduced-test-cases/)
+     and a [live example](http://jsfiddle.net/).
 
 
 Example:
