@@ -498,13 +498,9 @@ while (row = filter.next()) {
 
 // OUTPUT:
 // DatatableJs - Could not import row: "id" value is invalid undefined Object {type: function, nullable: false, sort_comparator: undefined, sort_transformer: undefined, sort_direction: "desc"}
-//
 // DatatableJs - Could not import row: "id" value is invalid null Object {type: function, nullable: false, sort_comparator: undefined, sort_transformer: undefined, sort_direction: "desc"}
-//
 // DatatableJs - Could not import row: "id" value is invalid 3 Object {type: function, nullable: false, sort_comparator: undefined, sort_transformer: undefined, sort_direction: "desc"}
-//
 // DatatableJs - 3 of 27 data rows were invalid
-//
 // 4 0 undefined
 // 5 1 null
 // 6 2 1
@@ -797,13 +793,9 @@ while (row = filter.next()) {
 
 // OUTPUT:
 // DatatableJs - Could not import row: "id" value is invalid undefined Object {type: function, nullable: false, sort_comparator: undefined, sort_transformer: undefined, sort_direction: "desc"}
-//
 // DatatableJs - Could not import row: "id" value is invalid null Object {type: function, nullable: false, sort_comparator: undefined, sort_transformer: undefined, sort_direction: "desc"}
-//
 // DatatableJs - Could not import row: "id" value is invalid 3 Object {type: function, nullable: false, sort_comparator: undefined, sort_transformer: undefined, sort_direction: "desc"}
-//
 // DatatableJs - 3 of 27 data rows were invalid
-//
 // 18 1 1
 // 22 1 1
 // 28 1 1
