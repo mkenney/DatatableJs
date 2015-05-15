@@ -33,6 +33,7 @@
 
 	/**
 	 * Get current column definitions
+	 *
 	 * @return {Object}
 	 */
 	Schema.prototype.getColumns = function() {
@@ -42,7 +43,8 @@
 	/**
 	 * Set or extend current column definitions
 	 *
-	 * This does not replace the current column definitions, it only extends and updates
+	 * This does not replace the current column definitions, it only extends and
+	 * updates
 	 *
 	 * @param  {Array} columns An array of column definition objects
 	 * @return {DatatableJs.lib.Schema}

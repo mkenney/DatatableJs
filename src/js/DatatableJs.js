@@ -91,7 +91,7 @@
 	};
 
 	/**
-	 * Set the local DatatableJs.lib.Data instance
+	 * Set the current DatatableJs.lib.Data instance
 	 *
 	 * @param  {DatatableJs.lib.Data} data
 	 * @return {DatatableJs}
@@ -108,8 +108,7 @@
 	 * @return {Array}
 	 */
 	DatatableJs.prototype.getRows = function() {
-		if (!(this._data instanceof this.lib.Data)) {this._data = new this.lib.Data();}
-		return this._data;
+		return this.getData().getRows();
 	};
 
 	/**
@@ -125,7 +124,7 @@
 	};
 
 	/**
-	 * Get the current schema object
+	 * Get the current DatatableJs.lib.Schema instance
 	 *
 	 * If an instance doesn't exist or is invalid one will be created
 	 *
@@ -139,7 +138,7 @@
 	};
 
 	/**
-	 * Store a schema object
+	 * Set the current DatatableJs.lib.Schema instance
 	 *
 	 * @param  {DatatableJs.lib.Schema} schema
 	 * @return {DatatableJs}
@@ -165,7 +164,7 @@
 	/**
 	 * Generate a filter instance linked to the current schema and data references
 	 *
-	 * @param {[type]} schema [description]
+	 * @return {DatatableJs.lib.Schema}
 	 */
 	DatatableJs.prototype.createFilter = function() {
 		return new this.lib.Filter(this.getData(), this.getSchema());

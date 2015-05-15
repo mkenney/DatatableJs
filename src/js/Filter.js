@@ -128,15 +128,20 @@
 	};
 
 	/**
-	 * Get the current DatatableJs.lib.Data reference
+	 * Get the current DatatableJs.lib.Data instance
+	 *
+	 * If an instance doesn't exist or is invalid one will be created
+	 *
 	 * @return {DatatableJs.lib.Data}
 	 */
 	Filter.prototype.getData = function() {
+		if (!(this._data instanceof global.DatatableJs.lib.Data)) {this._data = new global.DatatableJs.lib.Data();}
 		return this._data;
 	};
 
 	/**
 	 * Set the current DatatableJs.lib.Data reference
+	 *
 	 * @param  {DatatableJs.lib.Data}   data
 	 * @return {DatatableJs.lib.Filter}
 	 */
@@ -147,7 +152,8 @@
 	};
 
 	/**
-	 * Get the current set of data rows from the local DatatableJs.lib.Data
+	 * Get the current set of data rows
+	 *
 	 * @return {Array}
 	 */
 	Filter.prototype.getRows = function() {
@@ -155,8 +161,9 @@
 	};
 
 	/**
-	 * Set the current DatatableJs.lib.Data reference
-	 * @param  {DatatableJs.lib.Data}   data
+	 * Replace the current data set with an array of data rows
+	 *
+	 * @param  {Array} rows
 	 * @return {DatatableJs.lib.Filter}
 	 */
 	Filter.prototype.setRows = function(rows) {
@@ -166,16 +173,23 @@
 	};
 
 	/**
-	 * Get the current DatatableJs.lib.Schema reference
-	 * @return {[type]} [description]
+	 * Get the current DatatableJs.lib.Schema instance
+	 *
+	 * If an instance doesn't exist or is invalid one will be created
+	 *
+	 * @return {DatatableJs.lib.Schema}
 	 */
 	Filter.prototype.getSchema = function() {
+		if (!(this._schema instanceof global.DatatableJs.lib.Schema)) {
+			this._schema = new global.DatatableJs.lib.Schema();
+		}
 		return this._schema;
 	};
 
 	/**
-	 * Set the current DatatableJs.lib.Data reference
-	 * @param  {DatatableJs.lib.Schema} data
+	 * Set the current DatatableJs.lib.Schema instance
+	 *
+	 * @param  {DatatableJs.lib.Schema} schema
 	 * @return {DatatableJs.lib.Filter}
 	 */
 	Filter.prototype.setSchema = function(schema) {
@@ -185,7 +199,14 @@
 	};
 
 	/**
-	 * [addFilter description]
+	 * Add a filter rule
+	 *
+	 * {
+	 *     fields:        [array of column names]
+	 *     , comparators: [array of comparison control characters or functions]
+	 *     , values:      [array of values to compare with]
+	 * }
+	 *
 	 * @param  {Object}                 filter
 	 * @return {DatatableJs.lib.Filter}
 	 */
@@ -212,7 +233,7 @@
 	};
 
 	/**
-	 * [addSortRule description]
+	 * Add a sorting rule.  Supports a stable multi-sort.
 	 * @param  {Object}                 sort
 	 * @return {DatatableJs.lib.Filter}
 	 */
@@ -230,6 +251,34 @@
 		// Rule rejected
 		} else {
 			global.console.error('DatatableJs - An invalid sort definition was rejected', sort);
+		}
+
+		return this;
+	};
+
+	/**
+	 * Clear all sort rules
+	 *
+	 * @param  {Array}                   sort
+	 * @return {DatatableJs.lib.Filter}
+	 */
+	Filter.prototype.clearSortRules = function() {
+		this._sorts = [];
+		return this;
+	};
+
+	/**
+	 * Set all sort rules at once
+	 *
+	 * @param  {Array}                   sort
+	 * @return {DatatableJs.lib.Filter}
+	 */
+	Filter.prototype.setSortRules = function(sort_rules) {
+		if (!(sort_rules instanceof Array)) {throw new DatatableJs.lib.Exception('Sort rules must be an array of valid rule definition objects');}
+
+		this.clearSortRules();
+		for (var a = 0; a < sort_rules.length; a++) {
+			this.addSortRule(sort_rules[a]);
 		}
 
 		return this;

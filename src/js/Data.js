@@ -64,7 +64,8 @@
 	};
 
 	/**
-	 * Completely replace the current set of data rows
+	 * Replace the current data set with an array of data rows
+	 *
 	 * @param  {Array} rows
 	 * @return {DatatableJs.lib.Data}
 	 */
@@ -88,7 +89,10 @@
 	};
 
 	/**
-	 * Completely replace the current set of data rows, validating each one
+	 * Add a row to the current dataset
+	 *
+	 * If a schema is available, validate the row data.  Add support properties
+	 * for the stable sort implementation.
 	 *
 	 * @param  {Object} row
 	 * @return {DatatableJs.lib.Data}
@@ -126,16 +130,21 @@
 	};
 
 	/**
-	 * Get the schema instance
+	 * Get the current DatatableJs.lib.Schema instance
+	 *
+	 * If an instance doesn't exist or is invalid one will be created
 	 *
 	 * @return {DatatableJs.lib.Schema}
 	 */
 	Data.prototype.getSchema = function() {
+		if (!(this._schema instanceof global.DatatableJs.lib.Schema)) {
+			this._schema = new global.DatatableJs.lib.Schema();
+		}
 		return this._schema;
 	};
 
 	/**
-	 * Set the schema instance
+	 * Set the current DatatableJs.lib.Schema instance
 	 *
 	 * @param  {DatatableJs.lib.Schema} schema
 	 * @return {DatatableJs.lib.Data}
@@ -152,13 +161,18 @@
 	};
 
 	/**
-	 * Sort the data
+	 * Sort the data.
 	 *
-	 * @param  {String}          column     The column to sort on
-	 * @param  {String}          direction  Optional, the sort direction, either 'asc' or 'desc'
-	 * @param  {Function|String} comparator Optional, a method to use when comparing values for sorting
-	 *                                          - function(a, b) {} // A custom comparison function that compares two values for
-	 *                                                              // a match, return -1, 0 or 1
+	 * This implements a stable multi-sort algorithm
+	 *
+	 * @param  {String}          column      The column to sort on
+	 * @param  {String}          direction   Optional, the sort direction, either
+	 *                                       'asc' or 'desc'
+	 * @param  {Function|String} comparator  Optional, a method to use when comparing
+	 *                                       values for sorting
+	 *                                           - function(a, b) {} // A custom comparison function that
+	 *                                                               // compares two values for a match,
+	 *                                                               // return -1, 0 or 1
 	 * @param  {Function}        transformer A function to use to transform values prior to the sort
 	 *                                       comparison (stripping HTML, typecasting, etc.)
 	 * @return {DatatableJs.lib.Data}
