@@ -1,5 +1,5 @@
 /*!
- * DatatableJs v0.0.3 (https://github.com/mkenney/DatatableJs)
+ * DatatableJs v0.1.1 (https://github.com/mkenney/DatatableJs)
  * Copyright 2014-2015 Michael Kenney
  * Licensed under MIT (https://github.com/mkenney/DatatableJs/blob/master/LICENSE)
  */
@@ -98,7 +98,7 @@
 	};
 
 	/**
-	 * Set the local DatatableJs.lib.Data instance
+	 * Set the current DatatableJs.lib.Data instance
 	 *
 	 * @param  {DatatableJs.lib.Data} data
 	 * @return {DatatableJs}
@@ -115,8 +115,7 @@
 	 * @return {Array}
 	 */
 	DatatableJs.prototype.getRows = function() {
-		if (!(this._data instanceof this.lib.Data)) {this._data = new this.lib.Data();}
-		return this._data;
+		return this.getData().getRows();
 	};
 
 	/**
@@ -132,7 +131,7 @@
 	};
 
 	/**
-	 * Get the current schema object
+	 * Get the current DatatableJs.lib.Schema instance
 	 *
 	 * If an instance doesn't exist or is invalid one will be created
 	 *
@@ -146,7 +145,7 @@
 	};
 
 	/**
-	 * Store a schema object
+	 * Set the current DatatableJs.lib.Schema instance
 	 *
 	 * @param  {DatatableJs.lib.Schema} schema
 	 * @return {DatatableJs}
@@ -172,7 +171,7 @@
 	/**
 	 * Generate a filter instance linked to the current schema and data references
 	 *
-	 * @param {[type]} schema [description]
+	 * @return {DatatableJs.lib.Schema}
 	 */
 	DatatableJs.prototype.createFilter = function() {
 		return new this.lib.Filter(this.getData(), this.getSchema());
@@ -252,6 +251,7 @@
 
 	/**
 	 * Get current column definitions
+	 *
 	 * @return {Object}
 	 */
 	Schema.prototype.getColumns = function() {
@@ -261,7 +261,8 @@
 	/**
 	 * Set or extend current column definitions
 	 *
-	 * This does not replace the current column definitions, it only extends and updates
+	 * This does not replace the current column definitions, it only extends and
+	 * updates
 	 *
 	 * @param  {Array} columns An array of column definition objects
 	 * @return {DatatableJs.lib.Schema}
@@ -608,7 +609,8 @@
 	};
 
 	/**
-	 * Completely replace the current set of data rows
+	 * Replace the current data set with an array of data rows
+	 *
 	 * @param  {Array} rows
 	 * @return {DatatableJs.lib.Data}
 	 */
@@ -632,7 +634,10 @@
 	};
 
 	/**
-	 * Completely replace the current set of data rows, validating each one
+	 * Add a row to the current dataset
+	 *
+	 * If a schema is available, validate the row data.  Add support properties
+	 * for the stable sort implementation.
 	 *
 	 * @param  {Object} row
 	 * @return {DatatableJs.lib.Data}
@@ -670,16 +675,21 @@
 	};
 
 	/**
-	 * Get the schema instance
+	 * Get the current DatatableJs.lib.Schema instance
+	 *
+	 * If an instance doesn't exist or is invalid one will be created
 	 *
 	 * @return {DatatableJs.lib.Schema}
 	 */
 	Data.prototype.getSchema = function() {
+		if (!(this._schema instanceof global.DatatableJs.lib.Schema)) {
+			this._schema = new global.DatatableJs.lib.Schema();
+		}
 		return this._schema;
 	};
 
 	/**
-	 * Set the schema instance
+	 * Set the current DatatableJs.lib.Schema instance
 	 *
 	 * @param  {DatatableJs.lib.Schema} schema
 	 * @return {DatatableJs.lib.Data}
@@ -696,13 +706,18 @@
 	};
 
 	/**
-	 * Sort the data
+	 * Sort the data.
 	 *
-	 * @param  {String}          column     The column to sort on
-	 * @param  {String}          direction  Optional, the sort direction, either 'asc' or 'desc'
-	 * @param  {Function|String} comparator Optional, a method to use when comparing values for sorting
-	 *                                          - function(a, b) {} // A custom comparison function that compares two values for
-	 *                                                              // a match, return -1, 0 or 1
+	 * This implements a stable multi-sort algorithm
+	 *
+	 * @param  {String}          column      The column to sort on
+	 * @param  {String}          direction   Optional, the sort direction, either
+	 *                                       'asc' or 'desc'
+	 * @param  {Function|String} comparator  Optional, a method to use when comparing
+	 *                                       values for sorting
+	 *                                           - function(a, b) {} // A custom comparison function that
+	 *                                                               // compares two values for a match,
+	 *                                                               // return -1, 0 or 1
 	 * @param  {Function}        transformer A function to use to transform values prior to the sort
 	 *                                       comparison (stripping HTML, typecasting, etc.)
 	 * @return {DatatableJs.lib.Data}
@@ -982,15 +997,20 @@
 	};
 
 	/**
-	 * Get the current DatatableJs.lib.Data reference
+	 * Get the current DatatableJs.lib.Data instance
+	 *
+	 * If an instance doesn't exist or is invalid one will be created
+	 *
 	 * @return {DatatableJs.lib.Data}
 	 */
 	Filter.prototype.getData = function() {
+		if (!(this._data instanceof global.DatatableJs.lib.Data)) {this._data = new global.DatatableJs.lib.Data();}
 		return this._data;
 	};
 
 	/**
 	 * Set the current DatatableJs.lib.Data reference
+	 *
 	 * @param  {DatatableJs.lib.Data}   data
 	 * @return {DatatableJs.lib.Filter}
 	 */
@@ -1001,7 +1021,8 @@
 	};
 
 	/**
-	 * Get the current set of data rows from the local DatatableJs.lib.Data
+	 * Get the current set of data rows
+	 *
 	 * @return {Array}
 	 */
 	Filter.prototype.getRows = function() {
@@ -1009,8 +1030,9 @@
 	};
 
 	/**
-	 * Set the current DatatableJs.lib.Data reference
-	 * @param  {DatatableJs.lib.Data}   data
+	 * Replace the current data set with an array of data rows
+	 *
+	 * @param  {Array} rows
 	 * @return {DatatableJs.lib.Filter}
 	 */
 	Filter.prototype.setRows = function(rows) {
@@ -1020,16 +1042,23 @@
 	};
 
 	/**
-	 * Get the current DatatableJs.lib.Schema reference
-	 * @return {[type]} [description]
+	 * Get the current DatatableJs.lib.Schema instance
+	 *
+	 * If an instance doesn't exist or is invalid one will be created
+	 *
+	 * @return {DatatableJs.lib.Schema}
 	 */
 	Filter.prototype.getSchema = function() {
+		if (!(this._schema instanceof global.DatatableJs.lib.Schema)) {
+			this._schema = new global.DatatableJs.lib.Schema();
+		}
 		return this._schema;
 	};
 
 	/**
-	 * Set the current DatatableJs.lib.Data reference
-	 * @param  {DatatableJs.lib.Schema} data
+	 * Set the current DatatableJs.lib.Schema instance
+	 *
+	 * @param  {DatatableJs.lib.Schema} schema
 	 * @return {DatatableJs.lib.Filter}
 	 */
 	Filter.prototype.setSchema = function(schema) {
@@ -1039,7 +1068,14 @@
 	};
 
 	/**
-	 * [addFilter description]
+	 * Add a filter rule
+	 *
+	 * {
+	 *     fields:        [array of column names]
+	 *     , comparators: [array of comparison control characters or functions]
+	 *     , values:      [array of values to compare with]
+	 * }
+	 *
 	 * @param  {Object}                 filter
 	 * @return {DatatableJs.lib.Filter}
 	 */
@@ -1066,7 +1102,7 @@
 	};
 
 	/**
-	 * [addSortRule description]
+	 * Add a sorting rule.  Supports a stable multi-sort.
 	 * @param  {Object}                 sort
 	 * @return {DatatableJs.lib.Filter}
 	 */
@@ -1084,6 +1120,34 @@
 		// Rule rejected
 		} else {
 			global.console.error('DatatableJs - An invalid sort definition was rejected', sort);
+		}
+
+		return this;
+	};
+
+	/**
+	 * Clear all sort rules
+	 *
+	 * @param  {Array}                   sort
+	 * @return {DatatableJs.lib.Filter}
+	 */
+	Filter.prototype.clearSortRules = function() {
+		this._sorts = [];
+		return this;
+	};
+
+	/**
+	 * Set all sort rules at once
+	 *
+	 * @param  {Array}                   sort
+	 * @return {DatatableJs.lib.Filter}
+	 */
+	Filter.prototype.setSortRules = function(sort_rules) {
+		if (!(sort_rules instanceof Array)) {throw new global.DatatableJs.lib.Exception('Sort rules must be an array of valid rule definition objects');}
+
+		this.clearSortRules();
+		for (var a = 0; a < sort_rules.length; a++) {
+			this.addSortRule(sort_rules[a]);
 		}
 
 		return this;
