@@ -83,7 +83,11 @@
 		 * @private
 		 * @type {[type]}
 		 */
-		this._pagination = _PAGINATION_DEFAULTS;
+		this._pagination = {
+			  enabled:       _PAGINATION_DEFAULTS.enabled
+			, rows_per_page: _PAGINATION_DEFAULTS.rows_per_page
+			, current_page:  _PAGINATION_DEFAULTS.current_page
+		};
 
 		/**
 		 * [_pagination_counter description]
@@ -225,6 +229,7 @@
 				, comparators: filter.comparators
 				, values:      filter.values
 			});
+			this._length_is_calculated = false;
 
 		// Rule rejected
 		} else {
@@ -235,7 +240,40 @@
 	};
 
 	/**
+	 * Clear out all defined filters
+	 *
+	 * Also re-executes this iterator
+	 *
+	 * @return {[type]} [description]
+	 */
+	Iterator.prototype.clearFilterRules = function() {
+		this._filters = [];
+		this._length_is_calculated = false;
+		return this;
+	};
+
+	/**
+	 * Set all filter rules at once.
+	 *
+	 * Requires an array of valid filter rule objects
+	 *
+	 * @param {Array} filter_rules
+	 */
+	Iterator.prototype.setFilterRules = function(filter_rules) {
+		if (!(filter_rules instanceof Array)) {throw new global.DatatableJs.lib.Exception('Filter rules must be an array of valid rule definition objects');}
+
+		this.clearFilterRules();
+		for (var a = 0; a < filter_rules.length; a++) {
+			this.addFilterRule(filter_rules[a]);
+		}
+		this.execute();
+
+		return this;
+	};
+
+	/**
 	 * Add a sorting rule.  Supports a stable multi-sort.
+	 * Resets the executed flag to false...
 	 * @param  {Object}                 sort
 	 * @return {DatatableJs.lib.Iterator}
 	 */
@@ -249,6 +287,7 @@
 				, comparator:  (sort.comparator ? sort.comparator : undefined)
 				, transformer: (sort.transformer ? sort.transformer : undefined)
 			});
+			this._is_executed = false;
 
 		// Rule rejected
 		} else {
@@ -266,6 +305,7 @@
 	 */
 	Iterator.prototype.clearSortRules = function() {
 		this._sorts = [];
+		this._is_executed = false;
 		return this;
 	};
 
@@ -289,8 +329,8 @@
 	/**
 	 * Set a pagination rule for this iterator
 	 *
-	 * Pagination rules are taken into account when calling the next() method.
-	 * Page counts only include rows that match all current filter rules.
+	 * Pagination rules are taken into account when calling the next() and prev()
+	 * methods. Page counts only include rows that match all current filter rules.
 	 *
 	 * @param {Object} pagination An object containing pagination rules.  Options are:
 	 *     enabled       - True or false
@@ -314,24 +354,74 @@
 		if (undefined === pagination.current_page) {pagination.current_page = _PAGINATION_DEFAULTS.current_page;}
 		pagination.current_page = Math.round(Number(pagination.current_page));
 
-		this._pagination = pagination;
+		this._pagination.enabled       = pagination.enabled;
+		this._pagination.rows_per_page = pagination.rows_per_page;
+		this._pagination.current_page  = pagination.current_page;
 	};
 
+	/**
+	 * [setPage description]
+	 * @param {[type]} page [description]
+	 */
+	Iterator.prototype.getPage = function() {
+		return this._pagination.current_page;
+	}
+
+	/**
+	 * [setPage description]
+	 * @param {[type]} page [description]
+	 */
 	Iterator.prototype.setPage = function(page) {
 		if (!page) {throw new global.DatatableJs.lib.Exception('Invalid page number "'+page+'"');}
 		this._pagination.current_page = Math.round(Number(page));
+		return this;
 	}
 
+	/**
+	 * [setRowsPerPage description]
+	 * @return {Number}
+	 */
+	Iterator.prototype.getRowsPerPage = function() {
+		return this._pagination.rows_per_page;
+	}
+
+	/**
+	 * [setRowsPerPage description]
+	 * Always sets the current page to 1
+	 * @param {[type]} rows [description]
+	 */
 	Iterator.prototype.setRowsPerPage = function(rows) {
 		if (!rows) {throw new global.DatatableJs.lib.Exception('Invalid page size "'+rows+'"');}
 		this._pagination.rows_per_page = Math.round(Number(rows));
+		this._pagination.current_page = 1;
+		return this;
+	}
+
+	/**
+	 * [setRowsPerPage description]
+	 * @param {[type]} rows [description]
+	 */
+	Iterator.prototype.getPaginationEnabled = function() {
+		return (this._pagination.enabled === true);
+	}
+
+	/**
+	 * [setRowsPerPage description]
+	 * @param {[type]} rows [description]
+	 */
+	Iterator.prototype.setPaginationEnabled = function(enabled) {
+		if (!this._pagination.enabled) {
+			this._pagination.enabled = (true === enabled);
+		}
+		return this;
 	}
 
 	/**
 	 * "execute" an iterator
 	 *
-	 * Resets iterator properties, executes all sort rules and optionally sets
-	 * the pagination position
+	 * Resets iterator position and related values, and executes all sort rules
+	 * on initial execution. The current pagination position can be passed as an
+	 * argument
 	 *
 	 * @param  {Object}     options     Initialization options, currently only supports
 	 *                                  a 'page' option for pagination.  If included,
@@ -347,26 +437,26 @@
 		this._cur_value      = undefined;
 		this._pagination_counter = 0;
 
-		//
+		// Set the current page
 		if (options) {
-
-			// Set the current page
 			if (options.page) {
-				this._pagination.enabled = true;
-				this._pagination.current_page = Number(options.page);
+				this.setPaginationEnabled(true);
+				this.setPage(Number(options.page));
 			}
 		}
 
-		// Perform any defined sort operations in order to allow multi-sort
-		// operations
-		if (0 < this._sorts.length) {
-			for (var a = 0; a < this._sorts.length; a++) {
-				this.getData().sort(
-					  this._sorts[a].column
-					, this._sorts[a].direction
-					, this._sorts[a].comparator
-					, this._sorts[a].transformer
-				);
+		// Perform any defined sort rules in order, this allows multi-sort
+		// operations.  Only do this once unless the sort rules change
+		if (!this._is_executed) {
+			if (0 < this._sorts.length) {
+				for (var a = 0; a < this._sorts.length; a++) {
+					this.getData().sort(
+						  this._sorts[a].column
+						, this._sorts[a].direction
+						, this._sorts[a].comparator
+						, this._sorts[a].transformer
+					);
+				}
 			}
 		}
 
@@ -568,6 +658,51 @@
 		}
 		return ret_val;
 	};
+
+	/**
+	 * Flag noting whether the length has been calculated.  Any change to filter
+	 * rules should set this to false.
+	 * @type {Boolean}
+	 */
+	Iterator.prototype._length_is_calculated = false;
+
+	/**
+	 * Storage for the calculated number of rows for a given set of filters
+	 * @type {Number}
+	 */
+	Iterator.prototype._calculated_length = 0;
+
+	/**
+	 * Support method for the Iterator.length property.
+	 * Count the number of rows that match the current filter set.
+	 * @return {Number}
+	 */
+	Iterator.prototype._getCalculatedLength = function() {
+		if (!this._length_is_calculated) {
+			if (0 === this._filters.length) {
+				this._calculated_length = this.getRows().length;
+			} else {
+				for (var a = 0; a < this.getRows().length; a++) {
+					if (this.getRows()[a] && this.rowMatches(this.getRows()[a])) {
+						this._calculated_length++;
+					}
+				}
+			}
+		}
+		return this._calculated_length;
+	};
+
+	/**
+	 * Define the length property for the Iterator object
+	 */
+	Object.defineProperty(Iterator.prototype, 'length', {
+		set: function() {
+			throw new global.DatatableJs.lib.Exception('Cannot redefine property: length');
+		}
+		, get: function() {
+			return this._getCalculatedLength();
+		}
+	});
 
 	global.DatatableJs.lib.Iterator = Iterator;
 

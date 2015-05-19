@@ -808,6 +808,43 @@ while (row = iterator.next()) {
 // 16 2 1
 ```
 
+### More iterator examples
+
+Iterate through a specific page
+
+```javascript
+iterator.setPage(2); // Also supports getPage();
+iterator.execute();
+while (var data = iterator.next()) {...}
+```
+
+Update the number of rows per page.
+
+_This always resets the current page to 1_.
+
+```javascript
+iterator.setRowsPerPage(25); // Also supports getRowsPerPage();
+iterator.execute();
+while (var data = iterator.next()) {...}
+```
+
+Enable or disable pagination.
+
+If disabled, the iterator will always loop through the entire data set.
+
+```javascript
+iterator.setPaginationEnabled(false); // Also supports getPaginationEnabled();
+iterator.execute();
+while (var data = iterator.next()) {...}
+```
+
+Iterators now also have a length property that returns the number of iteratable
+rows.  This takes all filter definitions into account.
+
+```javascript
+iterator.length;
+```
+
 ## Contributing
 
 ### Using the issue tracker
