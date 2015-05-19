@@ -51,7 +51,7 @@
 		  Column:    undefined
 		, Schema:    undefined
 		, Data:      undefined
-		, Filter:    undefined
+		, Iterator:    undefined
 		, Exception: undefined
 	};
 	DatatableJs.prototype.lib = DatatableJs.lib;
@@ -162,12 +162,21 @@
 	};
 
 	/**
-	 * Generate a filter instance linked to the current schema and data references
+	 * Generate an iterator instance linked to the current schema and data references
 	 *
-	 * @return {DatatableJs.lib.Schema}
+	 * @return {DatatableJs.lib.Iterator}
+	 */
+	DatatableJs.prototype.createIterator = function() {
+		return new this.lib.Iterator(this.getData(), this.getSchema());
+	};
+
+	/**
+	 * Legacy support
+	 *
+	 * @return {DatatableJs.lib.Iterator}
 	 */
 	DatatableJs.prototype.createFilter = function() {
-		return new this.lib.Filter(this.getData(), this.getSchema());
+		return this.createIterator()
 	};
 
 	global.DatatableJs = DatatableJs;

@@ -69,7 +69,7 @@ module.exports = function (grunt) {
 					, 'src/js/Schema.js'
 					, 'src/js/Column.js'
 					, 'src/js/Data.js'
-					, 'src/js/Filter.js'
+					, 'src/js/Iterator.js'
 				]
 				, dest: 'assets/js/<%= pkg.version %>/<%= pkg.name %>.js'
 			}

@@ -1,6 +1,6 @@
 
 /**
- * Filter class for the DatatableJs library
+ * Iterator class for the DatatableJs library
  * References a Data and optionally a Schema object
  */
 +function(global, undefined) {
@@ -14,11 +14,12 @@
 	}
 
 	/**
-	 * Filter constructor
+	 * Iterator constructor
 	 *
-	 * @param {Object} filters Optional, an array of data filter definitions
+	 * @param {DatatableJs.lib.Data} data Optional, an instance of DatatableJs.lib.Data
+	 * @param {DatatableJs.lib.Schema} schema Optional, an instance of DatatableJs.lib.Schema
 	 */
-	var Filter = function(data, schema) {
+	var Iterator = function(data, schema) {
 
 		/**
 		 * Reference to the last matched row
@@ -35,9 +36,9 @@
 		this._data = undefined;
 
 		/**
-		 * An array of Object instances defining filters
+		 * An array of Object instances defining iterators
 		 * @private
-		 * @type {Array} An array of filter objects that are combined to create a filter rule:
+		 * @type {Array} An array of simple objects that are combined to create a filter rule:
 		 *       {
 		 *           fields: []        // One or more valid schema fields
 		 *           , comparators: [] // One or more comparison functions.  May be any of:
@@ -101,7 +102,7 @@
 		/**
 		 * An array of Object instances defining sorting rules
 		 * @private
-		 * @type {Array} An array of filter objects that are combined to create a filter rule:
+		 * @type {Array} An array of simple objects that are combined to create a sort order:
 		 *     {
 		 *           column:      ''                  The name of the column to sort by
 		 *         , direction:   'asc'               Optional, the sort order, either 'asc' or 'desc'
@@ -118,10 +119,11 @@
 
 	/**
 	 * Initialize
-	 * @param  {Object} filters Optional, an array of data filter definitions
-	 * @return {DatatableJs.lib.Filter}
+	 * @param {DatatableJs.lib.Data} data Optional, an instance of DatatableJs.lib.Data
+	 * @param {DatatableJs.lib.Schema} schema Optional, an instance of DatatableJs.lib.Schema
+	 * @return {DatatableJs.lib.Iterator}
 	 */
-	Filter.prototype.init = function(data, schema) {
+	Iterator.prototype.init = function(data, schema) {
 		this.setData(data);
 		this.setSchema(schema);
 		return this;
@@ -134,7 +136,7 @@
 	 *
 	 * @return {DatatableJs.lib.Data}
 	 */
-	Filter.prototype.getData = function() {
+	Iterator.prototype.getData = function() {
 		if (!(this._data instanceof global.DatatableJs.lib.Data)) {this._data = new global.DatatableJs.lib.Data();}
 		return this._data;
 	};
@@ -143,9 +145,9 @@
 	 * Set the current DatatableJs.lib.Data reference
 	 *
 	 * @param  {DatatableJs.lib.Data}   data
-	 * @return {DatatableJs.lib.Filter}
+	 * @return {DatatableJs.lib.Iterator}
 	 */
-	Filter.prototype.setData = function(data) {
+	Iterator.prototype.setData = function(data) {
 		if (!(data instanceof global.DatatableJs.lib.Data)) {throw new global.DatatableJs.lib.Exception('"data" must be an instance of DatatableJs.lib.Data');}
 		this._data = data;
 		return this;
@@ -156,7 +158,7 @@
 	 *
 	 * @return {Array}
 	 */
-	Filter.prototype.getRows = function() {
+	Iterator.prototype.getRows = function() {
 		return this.getData().getRows();
 	};
 
@@ -164,9 +166,9 @@
 	 * Replace the current data set with an array of data rows
 	 *
 	 * @param  {Array} rows
-	 * @return {DatatableJs.lib.Filter}
+	 * @return {DatatableJs.lib.Iterator}
 	 */
-	Filter.prototype.setRows = function(rows) {
+	Iterator.prototype.setRows = function(rows) {
 		if (!(rows instanceof Array)) {throw new global.DatatableJs.lib.Exception('The data set must be an array of data rows');}
 		this.getData().setRows(rows);
 		return this;
@@ -179,7 +181,7 @@
 	 *
 	 * @return {DatatableJs.lib.Schema}
 	 */
-	Filter.prototype.getSchema = function() {
+	Iterator.prototype.getSchema = function() {
 		if (!(this._schema instanceof global.DatatableJs.lib.Schema)) {
 			this._schema = new global.DatatableJs.lib.Schema();
 		}
@@ -190,9 +192,9 @@
 	 * Set the current DatatableJs.lib.Schema instance
 	 *
 	 * @param  {DatatableJs.lib.Schema} schema
-	 * @return {DatatableJs.lib.Filter}
+	 * @return {DatatableJs.lib.Iterator}
 	 */
-	Filter.prototype.setSchema = function(schema) {
+	Iterator.prototype.setSchema = function(schema) {
 		if (!(schema instanceof global.DatatableJs.lib.Schema)) {throw new global.DatatableJs.lib.Exception('"schema" must be an instance of DatatableJs.lib.Schema');}
 		this._schema = schema;
 		return this;
@@ -210,7 +212,7 @@
 	 * @param  {Object}                 filter
 	 * @return {DatatableJs.lib.Filter}
 	 */
-	Filter.prototype.addFilterRule = function(filter) {
+	Iterator.prototype.addFilterRule = function(filter) {
 
 		// Filter rules
 		if (filter.fields && filter.comparators && filter.values) {
@@ -235,9 +237,9 @@
 	/**
 	 * Add a sorting rule.  Supports a stable multi-sort.
 	 * @param  {Object}                 sort
-	 * @return {DatatableJs.lib.Filter}
+	 * @return {DatatableJs.lib.Iterator}
 	 */
-	Filter.prototype.addSortRule = function(sort) {
+	Iterator.prototype.addSortRule = function(sort) {
 
 		// Sort rules
 		if (sort.column) { // Only column is required
@@ -260,9 +262,9 @@
 	 * Clear all sort rules
 	 *
 	 * @param  {Array}                   sort
-	 * @return {DatatableJs.lib.Filter}
+	 * @return {DatatableJs.lib.Iterator}
 	 */
-	Filter.prototype.clearSortRules = function() {
+	Iterator.prototype.clearSortRules = function() {
 		this._sorts = [];
 		return this;
 	};
@@ -271,9 +273,9 @@
 	 * Set all sort rules at once
 	 *
 	 * @param  {Array}                   sort
-	 * @return {DatatableJs.lib.Filter}
+	 * @return {DatatableJs.lib.Iterator}
 	 */
-	Filter.prototype.setSortRules = function(sort_rules) {
+	Iterator.prototype.setSortRules = function(sort_rules) {
 		if (!(sort_rules instanceof Array)) {throw new global.DatatableJs.lib.Exception('Sort rules must be an array of valid rule definition objects');}
 
 		this.clearSortRules();
@@ -285,7 +287,7 @@
 	};
 
 	/**
-	 * Set a pagination rule for this filter
+	 * Set a pagination rule for this iterator
 	 *
 	 * Pagination rules are taken into account when calling the next() method.
 	 * Page counts only include rows that match all current filter rules.
@@ -295,7 +297,7 @@
 	 *     rows_per_page - Number of data rows to display per page
 	 *     current_page  - Set the current page index, default 1
 	 */
-	Filter.prototype.setPaginationRule = function(pagination) {
+	Iterator.prototype.setPaginationRule = function(pagination) {
 		if (undefined === pagination) {
 			throw new global.DatatableJs.lib.Exception('Argument required');
 
@@ -315,18 +317,18 @@
 		this._pagination = pagination;
 	};
 
-	Filter.prototype.setPage = function(page) {
+	Iterator.prototype.setPage = function(page) {
 		if (!page) {throw new global.DatatableJs.lib.Exception('Invalid page number "'+page+'"');}
 		this._pagination.current_page = Math.round(Number(page));
 	}
 
-	Filter.prototype.setRowsPerPage = function(rows) {
+	Iterator.prototype.setRowsPerPage = function(rows) {
 		if (!rows) {throw new global.DatatableJs.lib.Exception('Invalid page size "'+rows+'"');}
 		this._pagination.rows_per_page = Math.round(Number(rows));
 	}
 
 	/**
-	 * "execute" a filter
+	 * "execute" an iterator
 	 *
 	 * Resets iterator properties, executes all sort rules and optionally sets
 	 * the pagination position
@@ -336,9 +338,9 @@
 	 *                                  pagination is automatically enabled and rows
 	 *                                  returned by next() are limited to those in the
 	 *                                  specified page.
-	 * @return {DatatableJs.lib.Filter}
+	 * @return {DatatableJs.lib.Iterator}
 	 */
-	Filter.prototype.execute = function(options) {
+	Iterator.prototype.execute = function(options) {
 
 		this._iterator_key   = -1;
 		this._iterator_value = undefined;
@@ -382,7 +384,7 @@
 	 *
 	 * @return {Object} A data row, else undefined
 	 */
-	Filter.prototype.next = function() {
+	Iterator.prototype.next = function() {
 
 		if (this._iterator_key < this.getRows().length) {this._iterator_key++;}
 		if (!this._is_executed) {this.execute();}
@@ -428,12 +430,12 @@
 	};
 
 	/**
-	 * Return the last data row matched by this filter since the last execute() call
+	 * Return the last data row matched by this iterator since the last execute() call
 	 *
 	 * @return {Object} A data row, else undefined
 	 */
-	Filter.prototype.curr = function() {
-		if (!this._is_executed) {throw new global.DatatableJs.lib.Exception('Filters must be executed before they can be iterated');}
+	Iterator.prototype.curr = function() {
+		if (!this._is_executed) {throw new global.DatatableJs.lib.Exception('Iterators must be executed before they can be iterated');}
 		return this._cur_value;
 	};
 
@@ -445,9 +447,9 @@
 	 *
 	 * @return {Object} A data row, else undefined
 	 */
-	Filter.prototype.prev = function() {
+	Iterator.prototype.prev = function() {
 		if (this._iterator_key > -1) {this._iterator_key--;}
-		if (!this._is_executed) {throw new global.DatatableJs.lib.Exception('Filters must be executed before they can be iterated');}
+		if (!this._is_executed) {throw new global.DatatableJs.lib.Exception('Iterators must be executed before they can be iterated');}
 		this._iterator_value = undefined;
 
 		// Pagination checks
@@ -498,7 +500,7 @@
 	 * @param  {Object} row A single row of data
 	 * @return {bool}       True of the row matches ALL of the defined filters
 	 */
-	Filter.prototype.rowMatches = function(row) {
+	Iterator.prototype.rowMatches = function(row) {
 
 		// AND matching between filters
 		var ret_val = true;
@@ -540,7 +542,7 @@
 	 * @param  {Array} values      An array of values to compare against data
 	 * @return {bool}              True if data matches any combination of comparators and values, else false
 	 */
-	Filter.prototype._compare = function(data, comparators, values) {
+	Iterator.prototype._compare = function(data, comparators, values) {
 		var ret_val = false;
 		for (var a = 0; a < comparators.length; a++) {
 			for (var b = 0; b < values.length; b++) {
@@ -567,6 +569,6 @@
 		return ret_val;
 	};
 
-	global.DatatableJs.lib.Filter = Filter;
+	global.DatatableJs.lib.Iterator = Iterator;
 
 }(this);
