@@ -1,7 +1,7 @@
 
 /**
  * Iterator class for the DatatableJs library
- * References a Data and optionally a Schema object
+ * References a DatatableJs instance
  */
 +function(global, undefined) {
 	'use strict';
@@ -19,7 +19,11 @@
 	 * @param {DatatableJs.lib.Data} data Optional, an instance of DatatableJs.lib.Data
 	 * @param {DatatableJs.lib.Schema} schema Optional, an instance of DatatableJs.lib.Schema
 	 */
-	var Iterator = function(data, schema) {
+	var Iterator = function(datatable_instance) {
+
+		if (!(datatable_instance instanceof global.DatatableJs)) {throw new global.DatatableJs.lib.Exception('Iterator constructor requres a DatatableJs reference');}
+
+		this.datatable_instance = datatable_instance;
 
 		/**
 		 * Reference to the last matched row
@@ -27,13 +31,6 @@
 		 * @type {Object}
 		 */
 		this._cur_value = undefined;
-
-		/**
-		 * A DatatableJs.lib.Data instance
-		 * @private
-		 * @type {DatatableJs.lib.Data}
-		 */
-		this._data = undefined;
 
 		/**
 		 * An array of Object instances defining iterators
@@ -117,20 +114,6 @@
 		 *     }
 		 */
 		this._sorts = []
-
-		this.init(data, schema);
-	};
-
-	/**
-	 * Initialize
-	 * @param {DatatableJs.lib.Data} data Optional, an instance of DatatableJs.lib.Data
-	 * @param {DatatableJs.lib.Schema} schema Optional, an instance of DatatableJs.lib.Schema
-	 * @return {DatatableJs.lib.Iterator}
-	 */
-	Iterator.prototype.init = function(data, schema) {
-		this.setData(data);
-		this.setSchema(schema);
-		return this;
 	};
 
 	/**
@@ -141,8 +124,7 @@
 	 * @return {DatatableJs.lib.Data}
 	 */
 	Iterator.prototype.getData = function() {
-		if (!(this._data instanceof global.DatatableJs.lib.Data)) {this._data = new global.DatatableJs.lib.Data();}
-		return this._data;
+		return this.datatable_instance.getData();
 	};
 
 	/**
@@ -152,8 +134,7 @@
 	 * @return {DatatableJs.lib.Iterator}
 	 */
 	Iterator.prototype.setData = function(data) {
-		if (!(data instanceof global.DatatableJs.lib.Data)) {throw new global.DatatableJs.lib.Exception('"data" must be an instance of DatatableJs.lib.Data');}
-		this._data = data;
+		this.datatable_instance.setData(data);
 		return this;
 	};
 
@@ -186,10 +167,7 @@
 	 * @return {DatatableJs.lib.Schema}
 	 */
 	Iterator.prototype.getSchema = function() {
-		if (!(this._schema instanceof global.DatatableJs.lib.Schema)) {
-			this._schema = new global.DatatableJs.lib.Schema();
-		}
-		return this._schema;
+		return this.datatable_instance.getSchema();
 	};
 
 	/**
@@ -199,8 +177,7 @@
 	 * @return {DatatableJs.lib.Iterator}
 	 */
 	Iterator.prototype.setSchema = function(schema) {
-		if (!(schema instanceof global.DatatableJs.lib.Schema)) {throw new global.DatatableJs.lib.Exception('"schema" must be an instance of DatatableJs.lib.Schema');}
-		this._schema = schema;
+		this.datatable_instance.setSchema(schema);
 		return this;
 	};
 
@@ -360,16 +337,18 @@
 	};
 
 	/**
-	 * [setPage description]
-	 * @param {[type]} page [description]
+	 * Get the current page value
+	 * @return {Number}
 	 */
 	Iterator.prototype.getPage = function() {
-		return this._pagination.current_page;
+		return Number(this._pagination.current_page);
 	}
 
 	/**
-	 * [setPage description]
-	 * @param {[type]} page [description]
+	 * Set the current page value
+	 *
+	 * @param  {Number}
+	 * @return {DatatableJs.lib.Iterator}
 	 */
 	Iterator.prototype.setPage = function(page) {
 		if (!page) {throw new global.DatatableJs.lib.Exception('Invalid page number "'+page+'"');}
@@ -378,7 +357,8 @@
 	}
 
 	/**
-	 * [setRowsPerPage description]
+	 * Get the current number of rows per page
+	 *
 	 * @return {Number}
 	 */
 	Iterator.prototype.getRowsPerPage = function() {
@@ -386,9 +366,12 @@
 	}
 
 	/**
-	 * [setRowsPerPage description]
+	 * Set the numer of rows per page
+	 *
 	 * Always sets the current page to 1
-	 * @param {[type]} rows [description]
+	 *
+	 * @param  {Number} rows
+	 * @return {DatatableJs.lib.Iterator}
 	 */
 	Iterator.prototype.setRowsPerPage = function(rows) {
 		if (!rows) {throw new global.DatatableJs.lib.Exception('Invalid page size "'+rows+'"');}
@@ -398,16 +381,18 @@
 	}
 
 	/**
-	 * [setRowsPerPage description]
-	 * @param {[type]} rows [description]
+	 * Get the current enablement flag for pagination limiters
+	 *
+	 * @param {Boolean}
 	 */
 	Iterator.prototype.getPaginationEnabled = function() {
 		return (this._pagination.enabled === true);
 	}
 
 	/**
-	 * [setRowsPerPage description]
-	 * @param {[type]} rows [description]
+	 * Enable or disable pagination limiters
+	 * @param  {Boolean} enabled
+	 * @return {DatatableJs.lib.Iterator}
 	 */
 	Iterator.prototype.setPaginationEnabled = function(enabled) {
 		if (!this._pagination.enabled) {

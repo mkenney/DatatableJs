@@ -167,7 +167,7 @@
 	 * @return {DatatableJs.lib.Iterator}
 	 */
 	DatatableJs.prototype.createIterator = function() {
-		return new this.lib.Iterator(this.getData(), this.getSchema());
+		return new this.lib.Iterator(this);
 	};
 
 	global.DatatableJs = DatatableJs;
