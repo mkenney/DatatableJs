@@ -36,7 +36,7 @@ DatatableJs/
     │       ├── Data.js
     │       ├── DatatableJs.js
     │       ├── Exception.js
-    │       ├── Filter.js
+    │       ├── Iterator.js
     │       └── Schema.js
     │
     └── assets/
@@ -117,11 +117,11 @@ DatatableJs.prototype.getSchema
 DatatableJs.prototype.setSchema
 
 /**
- * Generate a filter instance linked to the current schema and data references
+ * Generate an iterator instance linked to the current schema and data references
  *
- * @return {DatatableJs.lib.Schema}
+ * @return {DatatableJs.lib.Iterator}
  */
-DatatableJs.prototype.createFilter
+DatatableJs.prototype.createIterator
 ```
 
 ### DatatableJs.lib.Schema API:
@@ -298,7 +298,7 @@ Data.prototype.sort
 Data.prototype.truncate
 ```
 
-### DatatableJs.lib.Filter API:
+### DatatableJs.lib.Iterator API:
 
 ```javascript
 /**
@@ -308,30 +308,30 @@ Data.prototype.truncate
  *
  * @return {DatatableJs.lib.Data}
  */
-Filter.prototype.getData
+Iterator.prototype.getData
 
 /**
  * Set the current DatatableJs.lib.Data reference
  *
  * @param  {DatatableJs.lib.Data}   data
- * @return {DatatableJs.lib.Filter}
+ * @return {DatatableJs.lib.Iterator}
  */
-Filter.prototype.setData
+Iterator.prototype.setData
 
 /**
  * Get the current set of data rows
  *
  * @return {Array}
  */
-Filter.prototype.getRows
+Iterator.prototype.getRows
 
 /**
  * Replace the current data set with an array of data rows
  *
  * @param  {Array} rows
- * @return {DatatableJs.lib.Filter}
+ * @return {DatatableJs.lib.Iterator}
  */
-Filter.prototype.setRows
+Iterator.prototype.setRows
 
 /**
  * Get the current DatatableJs.lib.Schema instance
@@ -340,15 +340,15 @@ Filter.prototype.setRows
  *
  * @return {DatatableJs.lib.Schema}
  */
-Filter.prototype.getSchema
+Iterator.prototype.getSchema
 
 /**
  * Set the current DatatableJs.lib.Schema instance
  *
  * @param  {DatatableJs.lib.Schema} schema
- * @return {DatatableJs.lib.Filter}
+ * @return {DatatableJs.lib.Iterator}
  */
-Filter.prototype.setSchema
+Iterator.prototype.setSchema
 ```
 
 ## Examples
@@ -387,17 +387,17 @@ var sample_schema = {
 
         // Optional, default custom comparator function to use when sorting this
         // column.  This value is not used if a comparitor function is defined
-        // when calling addSortRule() on a filter instance.
+        // when calling addSortRule() on an iterator instance.
         , sort_comparator: undefined
 
         // Optional, default data transformer function to use when before sorting
         // the data in this column.  This value is not used if a transformer
-        // function is defined when calling addSortRule() on a filter instance.
+        // function is defined when calling addSortRule() on an iterator instance.
         , sort_transformer: undefined
 
         // Optional, default sort direction for this column.  This value is not
-        // used if a sort_direction defined when calling addSortRule() on a
-        // filter instance.
+        // used if a sort_direction defined when calling addSortRule() on an
+        // iterator instance.
         , sort_direction:   'desc'
     }
     , col1: {
@@ -450,9 +450,9 @@ Loop through the data
 
 ```javascript
 var datatable = new DatatableJs({data: sample_data});
-var filter = datatable.createFilter();
+var iterator = datatable.createIterator();
 var row;
-while (row = filter.next()) {
+while (row = iterator.next()) {
     console.log(row.id, row.col1, row.col2);
 }
 
@@ -495,9 +495,9 @@ var datatable = new DatatableJs({
     schema: sample_schema,
     data: sample_data
 });
-var filter = datatable.createFilter();
+var iterator = datatable.createIterator();
 var row;
-while (row = filter.next()) {
+while (row = iterator.next()) {
     console.log(row.id, row.col1, row.col2);
 }
 
@@ -538,14 +538,14 @@ Filter the data
 
 ```javascript
 var datatable = new DatatableJs({data: sample_data});
-var filter = datatable.createFilter();
-filter.addFilterRule({
+var iterator = datatable.createIterator();
+iterator.addFilterRule({
     fields: 'id',
     comparators: '>',
     values: 10
 });
 var row;
-while (row = filter.next()) {
+while (row = iterator.next()) {
     console.log(row.id, row.col1, row.col2);
 }
 
@@ -576,8 +576,8 @@ Sort the data
 
 ```javascript
 var datatable = new DatatableJs({data: sample_data});
-var filter = datatable.createFilter();
-filter.addSortRule({
+var iterator = datatable.createIterator();
+iterator.addSortRule({
     column: 'col1',
     direction: 'desc',
     comparator: function(a, b) {
@@ -587,11 +587,11 @@ filter.addSortRule({
     },
     transformer: function(a) {return Number(a);}
 });
-filter.addSortRule({
+iterator.addSortRule({
     column: 'col2'
 });
 var row;
-while (row = filter.next()) {
+while (row = iterator.next()) {
     console.log(row.id, row.col1, row.col2);
 }
 
@@ -631,14 +631,14 @@ Paginate the data
 
 ```javascript
 var datatable = new DatatableJs({data: sample_data});
-var filter = datatable.createFilter();
-filter.setPaginationRule({
+var iterator = datatable.createIterator();
+iterator.setPaginationRule({
     enabled: true
     , rows_per_page: 10
     , current_page: 2
 });
 var row;
-while (row = filter.next()) {
+while (row = iterator.next()) {
     console.log(row.id, row.col1, row.col2);
 }
 
@@ -655,10 +655,10 @@ while (row = filter.next()) {
 // 22 1 1
 ```
 
-To iterate through the next (or any) page re-execute the filter with a page option:
+To iterate through the next (or any) page re-execute the iterator with a page option:
 ```javascript
-filter.execute({page: 3})
-while (row = filter.next()) {
+iterator.execute({page: 3})
+while (row = iterator.next()) {
     console.log(row.id, row.col1, row.col2);
 }
 
@@ -681,9 +681,9 @@ var datatable = new DatatableJs({
     data: sample_data
     , schema: sample_schema
 });
-var filter = datatable.createFilter();
+var iterator = datatable.createIterator();
 
-filter
+iterator
 
     // Individual filter rules perform an 'AND' match between each other, so each
     // row must match all of the filter rules that have been defined
@@ -792,7 +792,7 @@ filter
     });
 
 var row;
-while (row = filter.next()) {
+while (row = iterator.next()) {
     console.log(row.id, row.col1, row.col2);
 }
 

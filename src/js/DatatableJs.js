@@ -170,15 +170,6 @@
 		return new this.lib.Iterator(this.getData(), this.getSchema());
 	};
 
-	/**
-	 * Legacy support
-	 *
-	 * @return {DatatableJs.lib.Iterator}
-	 */
-	DatatableJs.prototype.createFilter = function() {
-		return this.createIterator()
-	};
-
 	global.DatatableJs = DatatableJs;
 
 }(this);
