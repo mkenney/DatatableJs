@@ -673,6 +673,7 @@
 					}
 				}
 			}
+			this._length_is_calculated = true;
 		}
 		return this._calculated_length;
 	};
