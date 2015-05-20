@@ -112,6 +112,26 @@
 	};
 
 	/**
+	 * Get a single (the first) data row that matches field values passed in options
+	 *
+	 * This is just a very simple iterator wrapper.
+	 *
+	 * @param  {Object} options Key => Value pairs
+	 * @return {Array}
+	 */
+	DatatableJs.prototype.getRow = function(options) {
+		var iterator = self.createIterator();\
+		for (var a in options) if (options.hasOwnProperty(a)) {
+			iterator.addFilterRule({
+				fields: a
+				, comparators: '=='
+				values: options[a]
+			});
+		}
+		return iterator.next();
+	}
+
+	/**
 	 * Replace the current data set with an array of data rows
 	 *
 	 * @param  {Array} rows
