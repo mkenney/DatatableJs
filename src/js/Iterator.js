@@ -567,6 +567,22 @@
 	};
 
 	/**
+	 * Delete the current row from the dataset
+	 *
+	 * @todo This might break other iterators created on the same datatable... keep an eye on that
+	 * @return {DatatableJs.lib.Iterator}
+	 */
+	Iterator.prototype.remove = function() {
+		this.getRows().splice(this._iterator_key, 1);
+		while (this._iterator_key > this.getRows().length) {
+			this._iterator_key--;
+		}
+		this._iterator_value = this.getRows()[this._iterator_key];
+		this._cur_value      = this.getRows()[this._iterator_key];
+		return this;
+	}
+
+	/**
 	 * Test to see if a row matches this filter definition
 	 *
 	 * The logic gives an AND match between filters and an OR match within filters

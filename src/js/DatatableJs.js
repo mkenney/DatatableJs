@@ -124,6 +124,20 @@
 	};
 
 	/**
+	 * Delete a set of rows defined by an iterator
+	 *
+	 * @param  {DatatableJs.lib.Iterator} iterator
+	 * @return {DatatableJs}
+	 */
+	DatatableJs.prototype.removeRows = function(iterator) {
+		if (!(iterator instanceof DatatableJs.lib.Iterator)) {throw new DatatableJs.lib.Exception('Deleteing rows requires a valid DatatableJs.lib.Iterator instance');}
+		iterator.execute();
+		while (iterator.next()) {
+			iterator.remove();
+		}
+	}
+
+	/**
 	 * Get the current DatatableJs.lib.Schema instance
 	 *
 	 * If an instance doesn't exist or is invalid one will be created
