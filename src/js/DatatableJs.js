@@ -120,12 +120,12 @@
 	 * @return {Array}
 	 */
 	DatatableJs.prototype.getRow = function(options) {
-		var iterator = self.createIterator();\
+		var iterator = this.createIterator();
 		for (var a in options) if (options.hasOwnProperty(a)) {
 			iterator.addFilterRule({
 				fields: a
 				, comparators: '=='
-				values: options[a]
+				, values: options[a]
 			});
 		}
 		return iterator.next();
