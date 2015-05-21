@@ -64,16 +64,18 @@
 	 * @return {DatatableJs}
 	 */
 	DatatableJs.prototype.init = function(args) {
-		if (undefined !== args.schema) {this.setSchema(args.schema);}
-		if (undefined !== args.data)   {
-			// Accept an array of data rows for convenience
-			if ((args.data instanceof Array)) {
-				var rows = args.data;
-				args.data = new this.lib.Data();
-				args.data.setSchema(this.getSchema());
-				args.data.setRows(rows);
+		if (args) {
+			if (undefined !== args.schema) {this.setSchema(args.schema);}
+			if (undefined !== args.data)   {
+				// Accept an array of data rows for convenience
+				if ((args.data instanceof Array)) {
+					var rows = args.data;
+					args.data = new this.lib.Data();
+					args.data.setSchema(this.getSchema());
+					args.data.setRows(rows);
+				}
+				this.setData(args.data);
 			}
-			this.setData(args.data);
 		}
 		return this;
 	};
@@ -100,6 +102,15 @@
 		if (!(data instanceof DatatableJs.lib.Data)) {throw new DatatableJs.lib.Exception('The data definition must be an instance of DatatableJs.lib.Data');}
 		this._data = data;
 		return this;
+	};
+
+	/**
+	 * Add a row to the current set
+	 *
+	 * @param {Array}
+	 */
+	DatatableJs.prototype.addRow = function(row) {
+		return this.getData().addRow(row);
 	};
 
 	/**

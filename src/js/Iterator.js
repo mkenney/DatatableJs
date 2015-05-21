@@ -25,6 +25,9 @@
 
 		this.datatable_instance = datatable_instance;
 
+		this._shadow_instance = new global.DatatableJs();
+		this._shadow_instance.setSchema(this.datatable_instance.getSchema());
+
 		/**
 		 * Reference to the last matched row
 		 * @private
@@ -62,6 +65,20 @@
 		this._is_executed = false;
 
 		/**
+		 * [_is_filtered description]
+		 * @private
+		 * @type {Boolean}
+		 */
+		this._is_filtered = false;
+
+		/**
+		 * [_is_sorted description]
+		 * @private
+		 * @type {Boolean}
+		 */
+		this._is_sorted = false;
+
+		/**
 		 * Stack pointer and current value for the data set referenced by _data
 		 * @private
 		 * @type {Number}
@@ -85,13 +102,6 @@
 			, rows_per_page: _PAGINATION_DEFAULTS.rows_per_page
 			, current_page:  _PAGINATION_DEFAULTS.current_page
 		};
-
-		/**
-		 * [_pagination_counter description]
-		 * @private
-		 * @type {[type]}
-		 */
-		this._pagination_counter = 0;
 
 		/**
 		 * A DatatableJs.lib.Schema instance
@@ -124,7 +134,10 @@
 	 * @return {DatatableJs.lib.Data}
 	 */
 	Iterator.prototype.getData = function() {
-		return this.datatable_instance.getData();
+		if (!this._is_filtered) {
+			this.applyFilterRules();
+		}
+		return this._shadow_instance.getData();
 	};
 
 	/**
@@ -135,6 +148,9 @@
 	 */
 	Iterator.prototype.setData = function(data) {
 		this.datatable_instance.setData(data);
+		this._shadow_instance.getData().truncate();
+		this._is_sorted = false;
+		this._is_filtered = false;
 		return this;
 	};
 
@@ -144,7 +160,10 @@
 	 * @return {Array}
 	 */
 	Iterator.prototype.getRows = function() {
-		return this.getData().getRows();
+		if (!this._is_filtered) {
+			this.applyFilterRules();
+		}
+		return this._shadow_instance.getRows();
 	};
 
 	/**
@@ -155,7 +174,10 @@
 	 */
 	Iterator.prototype.setRows = function(rows) {
 		if (!(rows instanceof Array)) {throw new global.DatatableJs.lib.Exception('The data set must be an array of data rows');}
-		this.getData().setRows(rows);
+		this.datatable_instance.setRows(rows);
+		this._shadow_instance.setRows(rows);
+		this._is_sorted = false;
+		this._is_filtered = false;
 		return this;
 	};
 
@@ -178,6 +200,9 @@
 	 */
 	Iterator.prototype.setSchema = function(schema) {
 		this.datatable_instance.setSchema(schema);
+		this._shadow_instance.setSchema(schema);
+		this._is_sorted = false;
+		this._is_filtered = false;
 		return this;
 	};
 
@@ -206,7 +231,7 @@
 				, comparators: filter.comparators
 				, values:      filter.values
 			});
-			this._length_is_calculated = false;
+			this._is_filtered = false;
 
 		// Rule rejected
 		} else {
@@ -225,7 +250,7 @@
 	 */
 	Iterator.prototype.clearFilterRules = function() {
 		this._filters = [];
-		this._length_is_calculated = false;
+		this._is_filtered = false;
 		return this;
 	};
 
@@ -243,7 +268,6 @@
 		for (var a = 0; a < filter_rules.length; a++) {
 			this.addFilterRule(filter_rules[a]);
 		}
-		this.execute();
 
 		return this;
 	};
@@ -264,7 +288,7 @@
 				, comparator:  (sort.comparator ? sort.comparator : undefined)
 				, transformer: (sort.transformer ? sort.transformer : undefined)
 			});
-			this._is_executed = false;
+			this._is_sorted = false;
 
 		// Rule rejected
 		} else {
@@ -282,7 +306,7 @@
 	 */
 	Iterator.prototype.clearSortRules = function() {
 		this._sorts = [];
-		this._is_executed = false;
+		this._is_sorted = false;
 		return this;
 	};
 
@@ -417,25 +441,59 @@
 	 */
 	Iterator.prototype.execute = function(options) {
 
-		this._iterator_key   = -1;
-		this._iterator_value = undefined;
-		this._cur_value      = undefined;
-		this._pagination_counter = 0;
-
 		// Set the current page
-		if (options) {
-			if (options.page) {
-				this.setPaginationEnabled(true);
-				this.setPage(Number(options.page));
-			}
+		if (options && options.page) {
+			this.setPaginationEnabled(true);
+			this.setPage(Number(options.page));
 		}
 
-		// Perform any defined sort rules in order, this allows multi-sort
-		// operations.  Only do this once unless the sort rules change
-		if (!this._is_executed) {
+		this._iterator_key   = this.getMinRow() - 1;
+		this._iterator_value = undefined;
+
+		// Shadow-copy the filtered data
+		this.applyFilterRules();
+
+		// Perform any defined sort rules in order on the shadow copy.
+		// This allows multi-sort operations.  Only do this once unless the sort
+		// rules change
+		this.applySortRules();
+
+		this._is_executed = true;
+
+		return this;
+	};
+
+	/**
+	 * Shadow-copy the filtered data
+	 * @return {[type]} [description]
+	 */
+	Iterator.prototype.applyFilterRules = function() {
+		if (!this._is_filtered) {
+			this._shadow_instance.getData().truncate();
+			for (var a = 0; a < this.datatable_instance.getRows().length; a++) {
+				if (
+					this.datatable_instance.getRows()[a]
+					&& this.rowMatches(this.datatable_instance.getRows()[a])
+				) {
+					this._shadow_instance.addRow(this.datatable_instance.getRows()[a]);
+				}
+			}
+			this._is_filtered = true;
+		}
+		return this;
+	};
+
+	/**
+	 * Perform any defined sort rules in order, this allows multi-sort
+	 * operations.
+	 * @return {[type]} [description]
+	 */
+	Iterator.prototype.applySortRules = function() {
+		if (!this._is_sorted) {
+			this.datatable_instance.getData().indexRows();
 			if (0 < this._sorts.length) {
 				for (var a = 0; a < this._sorts.length; a++) {
-					this.getData().sort(
+					this.datatable_instance.getData().sort(
 						  this._sorts[a].column
 						, this._sorts[a].direction
 						, this._sorts[a].comparator
@@ -443,12 +501,35 @@
 					);
 				}
 			}
+//			this.datatable_instance.getData().indexRows();
+
+			this._shadow_instance.getRows().sort(function(a, b) {
+				var ret_val = 0;
+				if (a.__pos__ < b.__pos__) {ret_val = -1;}
+				if (a.__pos__ > b.__pos__) {ret_val = 1;}
+				return ret_val;
+			});
+
+			this._is_sorted = true;
 		}
-
-		this._is_executed = true;
-
 		return this;
-	};
+	}
+
+	Iterator.prototype.getMinRow = function() {
+		var min_page_row = 0;
+		if (this._pagination.enabled) {
+			min_page_row = (this._pagination.current_page * this._pagination.rows_per_page) - this._pagination.rows_per_page;
+		}
+		return min_page_row;
+	}
+
+	Iterator.prototype.getMaxRow = function() {
+		var max_page_row = this.getRows().length;
+		if (this._pagination.enabled) {
+			max_page_row = (this._pagination.current_page * this._pagination.rows_per_page) - 1;
+		}
+		return max_page_row;
+	}
 
 	/**
 	 * Return the next matching row of data and increment the iterator accordingly
@@ -461,44 +542,16 @@
 	 */
 	Iterator.prototype.next = function() {
 
-		if (this._iterator_key < this.getRows().length) {this._iterator_key++;}
 		if (!this._is_executed) {this.execute();}
+		if (this._iterator_key <= this.getMaxRow()) {this._iterator_key++;}
 		this._iterator_value = undefined;
 
-		// Pagination checks
-		var min_page_row;
-		var max_page_row;
-		if (this._pagination.enabled) {
-			min_page_row = (this._pagination.current_page * this._pagination.rows_per_page) - this._pagination.rows_per_page;
-			max_page_row = (this._pagination.current_page * this._pagination.rows_per_page) - 1;
-		}
-
-		if (this._iterator_key < this.getRows().length) {
-			for (var a = this._iterator_key; a < this.getRows().length; a++) {
-
-				// Row matches current filters
-				if (this.getRows()[a] && this.rowMatches(this.getRows()[a])) {
-
-					// Check to see if the row is in the current page
-					var in_page = false;
-					if (this._pagination.enabled) {
-						in_page = (
-							this._pagination_counter >= min_page_row
-							&& this._pagination_counter <= max_page_row
-						);
-						this._pagination_counter++;
-					}
-
-					// If not paginated or in the current page, return row
-					if (!this._pagination.enabled || in_page) {
-						this._iterator_key   = a;
-						this._iterator_value = this.getRows()[a];
-						this._cur_value      = this.getRows()[a];
-						break;
-					}
-				}
-			}
-			this._iterator_key = a;
+		if (
+			this._iterator_key >= this.getMinRow()
+			&& this._iterator_key <= this.getMaxRow()
+			&& this.getRows()[this._iterator_key]
+		) {
+			this._iterator_value = this.getRows()[this._iterator_key];
 		}
 
 		return this._iterator_value;
@@ -511,7 +564,7 @@
 	 */
 	Iterator.prototype.curr = function() {
 		if (!this._is_executed) {throw new global.DatatableJs.lib.Exception('Iterators must be executed before they can be iterated');}
-		return this._cur_value;
+		return this._iterator_value;
 	};
 
 	/**
@@ -523,44 +576,17 @@
 	 * @return {Object} A data row, else undefined
 	 */
 	Iterator.prototype.prev = function() {
-		if (this._iterator_key > -1) {this._iterator_key--;}
+
+		if (this._iterator_key >= this.getMinRow()) {this._iterator_key--;}
 		if (!this._is_executed) {throw new global.DatatableJs.lib.Exception('Iterators must be executed before they can be iterated');}
 		this._iterator_value = undefined;
 
-		// Pagination checks
-		var min_page_row;
-		var max_page_row;
-		if (this._pagination.enabled) {
-			min_page_row = (this._pagination.current_page * this._pagination.rows_per_page) - this._pagination.rows_per_page;
-			max_page_row = (this._pagination.current_page * this._pagination.rows_per_page) - 1;
-		}
-
-		if (-1 < this._iterator_key) {
-			for (var a = this._iterator_key; a > -1; a--) {
-
-				// Row matches current filters
-				if (this.getRows()[a] && this.rowMatches(this.getRows()[a])) {
-
-					// Check to see if the row is in the current page
-					var in_page;
-					if (this._pagination.enabled) {
-						this._pagination_counter--;
-						in_page = (
-							this._pagination_counter >= min_page_row
-							&& this._pagination_counter <= max_page_row
-						);
-					}
-
-					// If not paginated or in the current page, return row
-					if (!this._pagination.enabled || in_page) {
-						this._iterator_key   = a;
-						this._iterator_value = this.getRows()[a];
-						this._cur_value      = this.getRows()[a];
-						break;
-					}
-				}
-			}
-			this._iterator_key = a;
+		if (
+			this._iterator_key >= this.getMinRow()
+			&& this._iterator_key <= this.getMaxRow()
+			&& this.getRows()[this._iterator_key]
+		) {
+			this._iterator_value = this.getRows()[this._iterator_key];
 		}
 
 		return this._iterator_value;
@@ -573,7 +599,12 @@
 	 * @return {DatatableJs.lib.Iterator}
 	 */
 	Iterator.prototype.remove = function() {
+
+		this.datatable_instance.getRows().splice(this._shadow_instance.getRows()[this._iterator_key].__pos__, 1);
 		this.getRows().splice(this._iterator_key, 1);
+
+		this.datatable_instance.getData().indexRows();
+
 		while (this._iterator_key > this.getRows().length) {
 			this._iterator_key--;
 		}
@@ -645,8 +676,8 @@
 					switch (comparators[a]) {
 						case '>':   ret_val = (data >   values[b]); break;
 						case '>=':  ret_val = (data >=  values[b]); break;
-						case '<':   ret_val = (data >   values[b]); break;
-						case '<=':  ret_val = (data >=  values[b]); break;
+						case '<':   ret_val = (data <   values[b]); break;
+						case '<=':  ret_val = (data <=  values[b]); break;
 						case '==':  ret_val = (data ==  values[b]); break;
 						case '===': ret_val = (data === values[b]); break;
 						case '!=':  ret_val = (data !=  values[b]); break;
@@ -659,6 +690,35 @@
 		}
 		return ret_val;
 	};
+
+	Iterator.prototype.reset = function() {
+		this
+			.clearFilterRules()
+			.clearSortRules()
+			.execute();
+		this._is_executed = false;
+	}
+
+	Iterator.prototype.where = function(fields, comparators, values) {
+		return this.addFilterRule({
+			fields: fields
+			, comparators: comparators
+			, values: values
+		});
+	};
+
+	Iterator.prototype.and = function(fields, comparators, values) {
+		return this.where(fields, comparators, values);
+	};
+
+	Iterator.prototype.orderBy = function(column, direction, comparator, transformer) {
+		return this.addSortRule({
+			column: column
+			, direction: direction
+			, comparator: comparator
+			, transformer: transformer
+		});
+	}
 
 	/**
 	 * Flag noting whether the length has been calculated.  Any change to filter
@@ -702,6 +762,9 @@
 			throw new global.DatatableJs.lib.Exception('Cannot redefine property: length');
 		}
 		, get: function() {
+			if (!this._is_filtered) {
+				this.execute();
+			}
 			return this._getCalculatedLength();
 		}
 	});

@@ -596,31 +596,31 @@ while (row = iterator.next()) {
 }
 
 // OUTPUT: - Note, null and undefined are automatically sorted to the bottom by default.
-// undefined 0 0
-// 11 0 0
-// 17 0 0
-// 7 "0" 0
-// 21 0 0
-// 27 0 0
-// 15 1 0
-// 25 1 0
-// 3 2 0
-// 13 2 0
-// 19 2 0
-// 23 2 0
-// 9 "2" 0
 // 29 2 0
-// 14 0 1
-// 24 0 1
-// null 1 1
-// 12 1 1
-// 8 "1" 1
-// 18 1 1
-// 22 1 1
-// 28 1 1
-// 6 2 1
-// 16 2 1
+// 9 "2" 0
+// 23 2 0
+// 19 2 0
+// 13 2 0
+// 3 2 0
+// 25 1 0
+// 15 1 0
+// 27 0 0
+// 21 0 0
+// 7 "0" 0
+// 17 0 0
+// 11 0 0
+// undefined 0 0
 // 26 2 1
+// 16 2 1
+// 6 2 1
+// 28 1 1
+// 22 1 1
+// 18 1 1
+// 8 "1" 1
+// 12 1 1
+// null 1 1
+// 24 0 1
+// 14 0 1
 // 4 0 undefined
 // 5 1 null
 ```
@@ -801,11 +801,11 @@ while (row = iterator.next()) {
 // DatatableJs - Could not import row: "id" value is invalid null Object {type: function, nullable: false, sort_comparator: undefined, sort_transformer: undefined, sort_direction: "desc"}
 // DatatableJs - Could not import row: "id" value is invalid 3 Object {type: function, nullable: false, sort_comparator: undefined, sort_transformer: undefined, sort_direction: "desc"}
 // DatatableJs - 3 of 27 data rows were invalid
-// 18 1 1
 // 22 1 1
-// 28 1 1
-// 26 2 1
-// 16 2 1
+// 18 1 1
+// 12 1 1
+// 24 0 1
+// 14 0 1
 ```
 
 ### More iterator examples

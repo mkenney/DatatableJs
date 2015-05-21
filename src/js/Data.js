@@ -121,8 +121,8 @@
 						__pos__ = val;
 					}
 				});
+				row.__pos__ = this._rows.length;
 			}
-			row.__pos__ = this._rows.length;
 			this._rows.push(row);
 		}
 
@@ -288,15 +288,13 @@
 				return ret_val;
 			});
 
-			// Update row position tracking for future sorts to allow multi-column
-			// sorting
-			for (var a = 0; a < this._rows.length; a++) {
-				this._rows[a].__pos__ = a;
-			}
-
 			if ('desc' === direction) {
 				this._rows.reverse();
 			}
+
+			// Update row position tracking for future sorts to allow multi-column
+			// sorting
+			this.indexRows();
 
 			// Update local metadata
 			this._current_sort_column    = column;
@@ -304,6 +302,14 @@
 		}
 
 		return this;
+	}
+
+	// Update row position tracking for future sorts to allow multi-column
+	// sorting
+	Data.prototype.indexRows = function() {
+		for (var a = 0; a < this._rows.length; a++) {
+			this._rows[a].__pos__ = a;
+		}
 	}
 
 	/**
