@@ -47,7 +47,7 @@
 	 * @return {DatatableJs.lib.Data}
 	 */
 	Data.prototype.init = function(rows) {
-		if (undefined !== rows && (rows instanceof Array)) {
+		if (undefined !== rows) {
 			this.setRows(rows);
 		}
 		return this;
@@ -209,7 +209,7 @@
 
 			// Optional function to transform values before comparison, I.E stripping
 			// out HTML or typecasting values
-			if ('function' !== transformer) {
+			if ('function' !== typeof transformer) {
 				transformer = undefined;
 			}
 
@@ -219,7 +219,7 @@
 					var ret_val;
 
 					if (undefined === a || null === a) {ret_val = -1}
-					if (undefined === b || null === b) {ret_val = 1}
+					else if (undefined === b || null === b) {ret_val = 1}
 					else if (a < b) {ret_val = -1;}
 					else if (a > b) {ret_val = 1;}
 					else {ret_val = 0;}
@@ -310,6 +310,7 @@
 		for (var a = 0; a < this._rows.length; a++) {
 			this._rows[a].__pos__ = a;
 		}
+		return this;
 	}
 
 	/**
@@ -323,6 +324,18 @@
 		this._rows = [];
 		return this;
 	}
+
+	/**
+	 * Define the length property for the Iterator object
+	 */
+	Object.defineProperty(Data.prototype, 'length', {
+		set: function() {
+			throw new global.DatatableJs.lib.Exception('Cannot redefine property: length');
+		}
+		, get: function() {
+			return this._rows.length;
+		}
+	});
 
 	global.DatatableJs.lib.Data = Data;
 

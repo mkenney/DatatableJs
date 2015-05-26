@@ -490,7 +490,6 @@
 	 */
 	Iterator.prototype.applySortRules = function() {
 		if (!this._is_sorted) {
-			this.datatable_instance.getData().indexRows();
 			if (0 < this._sorts.length) {
 				for (var a = 0; a < this._sorts.length; a++) {
 					this.datatable_instance.getData().sort(
@@ -501,7 +500,6 @@
 					);
 				}
 			}
-//			this.datatable_instance.getData().indexRows();
 
 			this._shadow_instance.getRows().sort(function(a, b) {
 				var ret_val = 0;
@@ -600,14 +598,12 @@
 	 */
 	Iterator.prototype.remove = function() {
 
-		this.datatable_instance.getRows().splice(this._shadow_instance.getRows()[this._iterator_key].__pos__, 1);
+		this.datatable_instance.getRows().splice(this.getRows()[this._iterator_key].__pos__, 1);
 		this.getRows().splice(this._iterator_key, 1);
 
+		this._iterator_key--;
 		this.datatable_instance.getData().indexRows();
 
-		while (this._iterator_key > this.getRows().length) {
-			this._iterator_key--;
-		}
 		this._iterator_value = this.getRows()[this._iterator_key];
 		this._cur_value      = this.getRows()[this._iterator_key];
 		return this;

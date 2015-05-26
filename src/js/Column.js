@@ -18,13 +18,17 @@
 		 * @private
 		 * @type {Object}
 		 *     type:             String    // A data type.  Any type if undefined
+		 *
 		 *     nullable:         true      // Whether to allow 'undefined' or omitted values
+		 *
+		 *     sort_direction:   'asc'     // The default sort direction for this column
+		 *
 		 *     sort_comparator:  undefined // A custom comparison function taking 3 arguments,
 		 *                                 // value a, value b and sort direction (either 'asc' or 'desc')
+		 *
 		 *     sort_transformer: undefined // A custom data transformation function taking 1 argument
 		 *                                 // that transforms value a and value b before the sort
 		 *                                 // comparison
-		 *     sort_direction:   'asc'     // The default sort direction for this column
 		 */
 		this._column_definition = {};
 

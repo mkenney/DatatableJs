@@ -90,6 +90,10 @@ module.exports = function (grunt) {
 			}
 		}
 
+		, qunit: {
+			all: ['test/*.html']
+		}
+
 		, watch: {
 			src: {
 				  files: 'src/js/*.js'
@@ -106,11 +110,16 @@ module.exports = function (grunt) {
 		}
 	);
 
+	grunt.loadNpmTasks('grunt-contrib-qunit');
+
 	// Lint and code style checks
 	grunt.registerTask('lint', ['jshint:grunt', 'jscs:grunt', 'jshint:core', 'jscs:core']);
 
+	// Pre-commit testing tasks
+	grunt.registerTask('test', ['qunit', 'lint']);
+
 	// Full distribution task.
-	grunt.registerTask('dist', ['lint', 'clean', 'concat', 'uglify']);
+	grunt.registerTask('dist', ['qunit', 'lint', 'clean', 'concat', 'uglify']);
 
 	// Default task.
 	grunt.registerTask('default', ['dist']);

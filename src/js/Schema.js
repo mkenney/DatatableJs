@@ -101,8 +101,11 @@
 	Schema.prototype.setColumn = function(column_name, column_definition) {
 
 		// Validate
-		if (!column_name)                   {throw new global.DatatableJs.lib.Exception('Invalid column name: "'+column_name+'"');}
-		if (!column_name instanceof String) {throw new global.DatatableJs.lib.Exception('The column name must be a string')}
+		if (!column_name)                    {throw new global.DatatableJs.lib.Exception('Invalid column name: "'+column_name+'"');}
+		if ('string' !== typeof column_name) {throw new global.DatatableJs.lib.Exception('The column name must be a string')}
+		if (!(column_definition instanceof global.DatatableJs.lib.Column)) {
+			column_definition = new global.DatatableJs.lib.Column(column_definition);
+		}
 
 		// Store
 		this._columns[column_name] = column_definition;
@@ -123,7 +126,7 @@
 		for (var column in columns) {if (columns.hasOwnProperty(column)) {
 			ret_val = this.isValidData(column, row[column]);
 			if (!ret_val) {
-				global.console.error('DatatableJs - Could not import row: "'+column+'" value is invalid', row[column], columns[column].getDefinition());
+				global.console.error('DatatableJs.lib.Schema: "'+column+'" value is invalid', row[column], columns[column].getDefinition());
 				break;
 			}
 		}}
@@ -189,20 +192,23 @@
 		var ret_val = true;
 		var column = this.getColumn(col);
 
-		if (ret_val) {
+		// Null data check
+		if (
+			false === column.get('nullable')
+			&& (
+				'undefined' === typeof value
+				|| null === value
+				|| '' === value
+			)
+		) {
+			ret_val = false;
+		}
+		// Datatype is defined, continue type checking
+		if (ret_val && undefined !== column.get('type')) {
 
 			ret_val = (
-					// Datatype is not defined
-					undefined === column.get('type')
-				||	(
 					// Datatype is specified using a string in the schema
 					getType(value) === column.get('type')
-				)
-				|| (
-					// Null data check
-					'Undefined' === getType(value)
-					&& column.get('nullable')
-				)
 				|| (
 					// Datatype is specified as a function reference but the
 					// actual value is probably a primitive
@@ -213,11 +219,40 @@
 					// Datatype is specified as a function reference for instance
 					// checks
 					'Function' === getType(column.get('type'))
-					&& value instanceof column.get('type')
+					&& (value instanceof column.get('type'))
 				)
 			);
 		}
 
+
+
+		/*
+			//ret_val = (
+			//		// Datatype is not defined
+			//		undefined === column.get('type')
+			//	||	(
+			//		// Datatype is specified using a string in the schema
+			//		getType(value) === column.get('type')
+			//	)
+			//	|| (
+			//		// Null data check
+			//		column.get('nullable')
+			//		&& ('Undefined' === getType(value))
+			//	)
+			//	|| (
+			//		// Datatype is specified as a function reference but the
+			//		// actual value is probably a primitive
+			//		'Function' === getType(column.get('type'))
+			//		&& getType(value) === column.get('type').name
+			//	)
+			//	|| (
+			//		// Datatype is specified as a function reference for instance
+			//		// checks
+			//		'Function' === getType(column.get('type'))
+			//		&& (value instanceof column.get('type'))
+			//	)
+			//);
+		*/
 		return ret_val;
 	}
 

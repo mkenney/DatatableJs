@@ -66,16 +66,7 @@
 	DatatableJs.prototype.init = function(args) {
 		if (args) {
 			if (undefined !== args.schema) {this.setSchema(args.schema);}
-			if (undefined !== args.data)   {
-				// Accept an array of data rows for convenience
-				if ((args.data instanceof Array)) {
-					var rows = args.data;
-					args.data = new this.lib.Data();
-					args.data.setSchema(this.getSchema());
-					args.data.setRows(rows);
-				}
-				this.setData(args.data);
-			}
+			if (undefined !== args.data)   {this.setData(args.data);}
 		}
 		return this;
 	};
@@ -99,8 +90,18 @@
 	 * @return {DatatableJs}
 	 */
 	DatatableJs.prototype.setData = function(data) {
-		if (!(data instanceof DatatableJs.lib.Data)) {throw new DatatableJs.lib.Exception('The data definition must be an instance of DatatableJs.lib.Data');}
-		this._data = data;
+		if (undefined !== data)   {
+			// Accept an array of data rows for convenience
+			if ((data instanceof Array)) {
+				var rows = data;
+				data = new this.lib.Data();
+				data.setSchema(this.getSchema());
+				data.setRows(rows);
+			} else if (!(data instanceof DatatableJs.lib.Data)) {
+				throw new DatatableJs.lib.Exception('The data definition must be an array of data rows or an instance of DatatableJs.lib.Data');
+			}
+			this._data = data;
+		}
 		return this;
 	};
 
@@ -166,6 +167,7 @@
 		while (iterator.next()) {
 			iterator.remove();
 		}
+		return this;
 	}
 
 	/**
