@@ -1,3 +1,4 @@
+
 +function(global, undefined) {
 	global.mock = {
 		column: {
@@ -57,7 +58,19 @@
 		}
 
 		, data: {
-			architecture: [
+			data_access_api_test: [
+				  {id: 0, col1: 1,  col2: 'a'}
+				, {id: 1, col1: 2,  col2: 'b'}
+				, {id: 2, col1: 3,  col2: 'c'}
+				, {id: 3, col1: 5,  col2: 'd'}
+				, {id: 4, col1: 8,  col2: 'e'}
+//				, {id: 5, col1: 13, col2: 'f'}
+//				, {id: 6, col1: 21, col2: 'g'}
+//				, {id: 7, col1: 34, col2: 'h'}
+//				, {id: 8, col1: 55, col2: 'i'}
+//				, {id: 9, col1: 89, col2: 'j'}
+			]
+			, architecture: [
 				  {col1: 'a', col2: 1, col3: {a: '1'}, col4: [1, 2], col5: true }
 				, {col1: 'b', col2: 2, col3: {a:  2 }, col4: [2, 3], col5: false}
 				, {col1:  1 , col2: 3, col3: {a: 'a'}, col4: [3, 4], col5: true }

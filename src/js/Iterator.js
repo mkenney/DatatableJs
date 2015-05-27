@@ -134,24 +134,8 @@
 	 * @return {DatatableJs.lib.Data}
 	 */
 	Iterator.prototype.getData = function() {
-		if (!this._is_filtered) {
-			this.applyFilterRules();
-		}
+		this.applyFilterRules();
 		return this._shadow_instance.getData();
-	};
-
-	/**
-	 * Set the current DatatableJs.lib.Data reference
-	 *
-	 * @param  {DatatableJs.lib.Data}   data
-	 * @return {DatatableJs.lib.Iterator}
-	 */
-	Iterator.prototype.setData = function(data) {
-		this.datatable_instance.setData(data);
-		this._shadow_instance.getData().truncate();
-		this._is_sorted = false;
-		this._is_filtered = false;
-		return this;
 	};
 
 	/**
@@ -160,25 +144,8 @@
 	 * @return {Array}
 	 */
 	Iterator.prototype.getRows = function() {
-		if (!this._is_filtered) {
-			this.applyFilterRules();
-		}
+		this.applyFilterRules();
 		return this._shadow_instance.getRows();
-	};
-
-	/**
-	 * Replace the current data set with an array of data rows
-	 *
-	 * @param  {Array} rows
-	 * @return {DatatableJs.lib.Iterator}
-	 */
-	Iterator.prototype.setRows = function(rows) {
-		if (!(rows instanceof Array)) {throw new global.DatatableJs.lib.Exception('The data set must be an array of data rows');}
-		this.datatable_instance.setRows(rows);
-		this._shadow_instance.setRows(rows);
-		this._is_sorted = false;
-		this._is_filtered = false;
-		return this;
 	};
 
 	/**
@@ -190,20 +157,6 @@
 	 */
 	Iterator.prototype.getSchema = function() {
 		return this.datatable_instance.getSchema();
-	};
-
-	/**
-	 * Set the current DatatableJs.lib.Schema instance
-	 *
-	 * @param  {DatatableJs.lib.Schema} schema
-	 * @return {DatatableJs.lib.Iterator}
-	 */
-	Iterator.prototype.setSchema = function(schema) {
-		this.datatable_instance.setSchema(schema);
-		this._shadow_instance.setSchema(schema);
-		this._is_sorted = false;
-		this._is_filtered = false;
-		return this;
 	};
 
 	/**
@@ -221,7 +174,7 @@
 	Iterator.prototype.addFilterRule = function(filter) {
 
 		// Filter rules
-		if (filter.fields && filter.comparators && filter.values) {
+		if (filter && filter.fields && filter.comparators && filter.values) {
 			if (!(filter.fields instanceof Array))      {filter.fields = [filter.fields];}
 			if (!(filter.comparators instanceof Array)) {filter.comparators = [filter.comparators];}
 			if (!(filter.values instanceof Array))      {filter.values = [filter.values];}
@@ -235,7 +188,7 @@
 
 		// Rule rejected
 		} else {
-			global.console.error('DatatableJs - An invalid filter definition was rejected', filter);
+			throw new global.DatatableJs.lib.Exception('An invalid filter definition was rejected', filter);
 		}
 
 		return this;
@@ -281,9 +234,9 @@
 	Iterator.prototype.addSortRule = function(sort) {
 
 		// Sort rules
-		if (sort.column) { // Only column is required
+		if (sort && sort.column && sort.column+'') { // Only column is required
 			this._sorts.push({
-				  column:      sort.column
+				  column:      sort.column+''
 				, direction:   (sort.direction ? sort.direction : undefined)
 				, comparator:  (sort.comparator ? sort.comparator : undefined)
 				, transformer: (sort.transformer ? sort.transformer : undefined)
@@ -292,7 +245,7 @@
 
 		// Rule rejected
 		} else {
-			global.console.error('DatatableJs - An invalid sort definition was rejected', sort);
+			throw new global.DatatableJs.lib.Exception('An invalid sort definition was rejected', sort);
 		}
 
 		return this;
@@ -339,25 +292,38 @@
 	 *     current_page  - Set the current page index, default 1
 	 */
 	Iterator.prototype.setPaginationRule = function(pagination) {
-		if (undefined === pagination) {
-			throw new global.DatatableJs.lib.Exception('Argument required');
-
-		} else if (!pagination) {
-			pagination = _PAGINATION_DEFAULTS;
+		if (
+			undefined === pagination
+			|| (
+				undefined === pagination.enabled
+				&& undefined === pagination.rows_per_page
+				&& undefined === pagination.current_page
+			)
+		) {
+			throw new global.DatatableJs.lib.Exception('An invalid pagination rule was rejected', pagination);
 		}
 
-		if (undefined === pagination.enabled) {pagination.enabled = _PAGINATION_DEFAULTS.enabled;}
-		pagination.enabled = (true === pagination.enabled);
+		// Merge with current or default values
+		if (!pagination.enabled) {
+			pagination.enabled = (this._pagination.enabled ? this._pagination.enabled : _PAGINATION_DEFAULTS.enabled);
+		}
+		if (!pagination.rows_per_page) {
+			pagination.rows_per_page = (this._pagination.rows_per_page ? this._pagination.rows_per_page : _PAGINATION_DEFAULTS.rows_per_page);
+		}
+		if (!pagination.current_page) {
+			pagination.current_page  = (this._pagination.current_page ? this._pagination.current_page : _PAGINATION_DEFAULTS.current_page);
+		}
 
-		if (undefined === pagination.rows_per_page) {pagination.rows_per_page = _PAGINATION_DEFAULTS.rows_per_page;}
+		// Typecast/typecheck
+		pagination.enabled       = (true === pagination.enabled);
 		pagination.rows_per_page = Math.round(Number(pagination.rows_per_page));
-
-		if (undefined === pagination.current_page) {pagination.current_page = _PAGINATION_DEFAULTS.current_page;}
-		pagination.current_page = Math.round(Number(pagination.current_page));
+		pagination.current_page  = Math.round(Number(pagination.current_page));
 
 		this._pagination.enabled       = pagination.enabled;
 		this._pagination.rows_per_page = pagination.rows_per_page;
 		this._pagination.current_page  = pagination.current_page;
+
+		return this;
 	};
 
 	/**
@@ -419,9 +385,7 @@
 	 * @return {DatatableJs.lib.Iterator}
 	 */
 	Iterator.prototype.setPaginationEnabled = function(enabled) {
-		if (!this._pagination.enabled) {
-			this._pagination.enabled = (true === enabled);
-		}
+		this._pagination.enabled = (true === enabled);
 		return this;
 	}
 
@@ -601,7 +565,7 @@
 		this.datatable_instance.getRows().splice(this.getRows()[this._iterator_key].__pos__, 1);
 		this.getRows().splice(this._iterator_key, 1);
 
-		this._iterator_key--;
+		while (this._iterator_key >= this.getRows().length) {this._iterator_key--;}
 		this.datatable_instance.getData().indexRows();
 
 		this._iterator_value = this.getRows()[this._iterator_key];
@@ -717,40 +681,6 @@
 	}
 
 	/**
-	 * Flag noting whether the length has been calculated.  Any change to filter
-	 * rules should set this to false.
-	 * @type {Boolean}
-	 */
-	Iterator.prototype._length_is_calculated = false;
-
-	/**
-	 * Storage for the calculated number of rows for a given set of filters
-	 * @type {Number}
-	 */
-	Iterator.prototype._calculated_length = 0;
-
-	/**
-	 * Support method for the Iterator.length property.
-	 * Count the number of rows that match the current filter set.
-	 * @return {Number}
-	 */
-	Iterator.prototype._getCalculatedLength = function() {
-		if (!this._length_is_calculated) {
-			if (0 === this._filters.length) {
-				this._calculated_length = this.getRows().length;
-			} else {
-				for (var a = 0; a < this.getRows().length; a++) {
-					if (this.getRows()[a] && this.rowMatches(this.getRows()[a])) {
-						this._calculated_length++;
-					}
-				}
-			}
-			this._length_is_calculated = true;
-		}
-		return this._calculated_length;
-	};
-
-	/**
 	 * Define the length property for the Iterator object
 	 */
 	Object.defineProperty(Iterator.prototype, 'length', {
@@ -758,10 +688,8 @@
 			throw new global.DatatableJs.lib.Exception('Cannot redefine property: length');
 		}
 		, get: function() {
-			if (!this._is_filtered) {
-				this.execute();
-			}
-			return this._getCalculatedLength();
+			this.applyFilterRules();
+			return this._shadow_instance.getRows().length
 		}
 	});
 

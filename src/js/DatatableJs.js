@@ -2,23 +2,6 @@
 +function(global, undefined) {
 	'use strict';
 
-	// This library uses console messages to provide non-fatal error feedback, make
-	// sure those methods exist in all environments.
-	if (!global.console)                {global.console = {};}
-	if (!global.console.assert)         {global.console.assert         = function() {};}
-	if (!global.console.count)          {global.console.count          = function() {};}
-	if (!global.console.dir)            {global.console.dir            = function() {};}
-	if (!global.console.error)          {global.console.error          = function() {};}
-	if (!global.console.group)          {global.console.group          = function() {};}
-	if (!global.console.groupCollapsed) {global.console.groupCollapsed = function() {};}
-	if (!global.console.groupEnd)       {global.console.groupEnd       = function() {};}
-	if (!global.console.info)           {global.console.info           = function() {};}
-	if (!global.console.log)            {global.console.log            = function() {};}
-	if (!global.console.time)           {global.console.time           = function() {};}
-	if (!global.console.timeEnd)        {global.console.timeEnd        = function() {};}
-	if (!global.console.trace)          {global.console.trace          = function() {};}
-	if (!global.console.warn)           {global.console.warn           = function() {};}
-
 	/**
 	 * DatatableJs constructor
 	 *
@@ -41,6 +24,25 @@
 
 		this.init(args);
 	};
+
+	// This library uses console messages to provide non-fatal error feedback, make
+	// sure those methods exist in all environments.
+	DatatableJs.console = global.console;
+	if (!DatatableJs.console)                {DatatableJs.console = {};}
+	if (!DatatableJs.console.assert)         {DatatableJs.console.assert         = function() {};}
+	if (!DatatableJs.console.count)          {DatatableJs.console.count          = function() {};}
+	if (!DatatableJs.console.dir)            {DatatableJs.console.dir            = function() {};}
+	if (!DatatableJs.console.error)          {DatatableJs.console.error          = function() {};}
+	if (!DatatableJs.console.group)          {DatatableJs.console.group          = function() {};}
+	if (!DatatableJs.console.groupCollapsed) {DatatableJs.console.groupCollapsed = function() {};}
+	if (!DatatableJs.console.groupEnd)       {DatatableJs.console.groupEnd       = function() {};}
+	if (!DatatableJs.console.info)           {DatatableJs.console.info           = function() {};}
+	if (!DatatableJs.console.log)            {DatatableJs.console.log            = function() {};}
+	if (!DatatableJs.console.time)           {DatatableJs.console.time           = function() {};}
+	if (!DatatableJs.console.timeEnd)        {DatatableJs.console.timeEnd        = function() {};}
+	if (!DatatableJs.console.trace)          {DatatableJs.console.trace          = function() {};}
+	if (!DatatableJs.console.warn)           {DatatableJs.console.warn           = function() {};}
+
 
 	/**
 	 * Store class references so they can be created and validated on demand
@@ -154,21 +156,6 @@
 		this.getData().setRows(rows);
 		return this;
 	};
-
-	/**
-	 * Delete a set of rows defined by an iterator
-	 *
-	 * @param  {DatatableJs.lib.Iterator} iterator
-	 * @return {DatatableJs}
-	 */
-	DatatableJs.prototype.removeRows = function(iterator) {
-		if (!(iterator instanceof DatatableJs.lib.Iterator)) {throw new DatatableJs.lib.Exception('Deleteing rows requires a valid DatatableJs.lib.Iterator instance');}
-		iterator.execute();
-		while (iterator.next()) {
-			iterator.remove();
-		}
-		return this;
-	}
 
 	/**
 	 * Get the current DatatableJs.lib.Schema instance

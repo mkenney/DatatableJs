@@ -1,4 +1,5 @@
 +function(global, undefined) {
+	'use strict';
 
 ////////////////////////////////////////////////////////////////////////
 // Init
@@ -216,7 +217,6 @@
 			!schema.isValidRow(global.mock.data.architecture[2])
 			, 'Schema::isValidRow(Object {data row}) // Invalid Row'
 		);
-		console.log('Previous test should output a console.error()');
 
 		ok(
 			schema.isValidData('col1', 'a')
@@ -446,7 +446,6 @@
 			schema: global.mock.schema.architecture
 			, data: global.mock.data.architecture
 		});
-		console.log('Previous object initialization should output a console.error() and a console.info()');
 
 		ok(
 			datatable instanceof global.DatatableJs
@@ -499,14 +498,12 @@
 			&& 'function' === typeof datatable.getSchema().getColumns().col5.get('sort_transformer')
 			, 'DatatableJs::init(Object {schema: Object, data: Array})'
 		);
-		console.log('Previous object initialization should output a console.error() and a console.info()');
 
 		// Use this instance for remaining tests?
 		var datatable = new global.DatatableJs({
 			schema: global.mock.schema.architecture
 			, data: global.mock.data.architecture
 		});
-		console.log('Previous object initialization should output a console.error() and a console.info()');
 
 		ok(
 			datatable.addRow(global.mock.data.additional_rows[0])
@@ -519,21 +516,18 @@
 			&& 3 === datatable.getData().getRows().length
 			, 'DatatableJs::addRow(Object {data row}) // Incorrect col1 data type'
 		);
-		console.log('Previous test should output a console.error()');
 
 		ok(
 			datatable.addRow(global.mock.data.additional_rows[2])
 			&& 3 === datatable.getData().getRows().length
 			, 'DatatableJs::addRow(Object {data row}) // Incorrect col2 data type'
 		);
-		console.log('Previous test should output a console.error()');
 
 		ok(
 			datatable.addRow(global.mock.data.additional_rows[3])
 			&& 3 === datatable.getData().getRows().length
 			, 'DatatableJs::addRow(Object {data row}) // Missing non-nullable col1 data'
 		);
-		console.log('Previous test should output a console.error()');
 
 		ok(
 			datatable.getRows() === datatable.getData().getRows()
@@ -547,7 +541,6 @@
 			&& 2 === datatable.getRows().length
 			, 'DatatableJs::setRows(Array [data row objects])'
 		);
-		console.log('Previous test should output a console.error() and a console.info()');
 
 		ok(
 			datatable.getSchema() instanceof global.DatatableJs.lib.Schema
@@ -592,20 +585,6 @@
 			undefined === datatable.getRow({col1: 'c'})
 			, 'DatatableJs::getRow(Object {filter}) // Matching 0 rows'
 		);
-
-
-		var iterator = datatable.createIterator();
-		iterator.addFilterRule({
-			fields: 'col1'
-			, comparators: '=='
-			, values: 'a'
-		});
-		ok(
-			(datatable.removeRows(iterator) instanceof DatatableJs)
-			&& 1 === datatable.getRows().length
-			, 'DatatableJs::removeRows(Iterator iterator)'
-		);
-
 	});
 
 ////////////////////////////////////////////////////////////////////////
@@ -621,11 +600,398 @@
 			, 'Iterator constructor requires an argument'
 		);
 
+		throws(
+			function() {var iterator = new global.DatatableJs.lib.Iterator(['a', 'b', 'c']);}
+			, global.DatatableJs.lib.Exception
+			, 'Iterator constructor cannot be an Array'
+		);
+
+		throws(
+			function() {var iterator = new global.DatatableJs.lib.Iterator({'a': 1, 'b': 2, 'c': 3});}
+			, global.DatatableJs.lib.Exception
+			, 'Iterator constructor cannot be an Object'
+		);
+
 		var iterator = new global.DatatableJs.lib.Iterator(new global.DatatableJs());
 		ok(
 			iterator instanceof global.DatatableJs.lib.Iterator
-			, 'Instanceof check passed'
+			, 'Iterator constructor CAN be an instance of DatatableJs... there must be a better test for this'
 		);
+	});
+
+
+	//
+	// General API
+	//
+	test('Iterator object API', function() {
+		// Use this instance for remaining tests?
+		var datatable = new global.DatatableJs({
+			schema: global.mock.schema.architecture
+			, data: global.mock.data.architecture
+		});
+		var iterator;
+		var new_datatable;
+
+		iterator = datatable.createIterator();
+		ok(
+			datatable.getRows().length === iterator.length
+			, 'Iterator::length // No filters, matches total number of data rows'
+		);
+
+		iterator = datatable.createIterator();
+		iterator.addFilterRule({
+			fields: 'col1'
+			, comparators: '=='
+			, values: 'b'
+		});
+		ok(
+			1 === iterator.length
+			&& iterator.length < datatable.getRows().length
+			, 'Iterator::length // One filter, less than total number of data rows'
+		);
+
+		iterator = datatable.createIterator();
+		ok(
+			iterator.getData() instanceof global.DatatableJs.lib.Data
+			&& iterator.getData().getRows().length === datatable.getRows().length
+			, 'Iterator::getData()'
+		);
+
+		datatable = new global.DatatableJs({
+			schema: global.mock.schema.architecture
+			, data: global.mock.data.architecture
+		});
+		iterator = datatable.createIterator();
+		ok(
+			2 === iterator.getRows().length
+			, 'Iterator::getRows() // No filters, getRows() should return the full data set'
+		);
+
+		iterator.addFilterRule({
+			fields: 'col1'
+			, comparators: '=='
+			, values: 'b'
+		});
+		ok(
+			1 === iterator.getRows().length
+			, 'Iterator::getRows() // 1 filter, getRows() should only return the filtered data set'
+		);
+	});
+
+
+	//
+	// Filter Rule API
+	//
+	test('Iterator Filter Rule API', function() {
+		var datatable = new global.DatatableJs({
+			schema: global.mock.schema.architecture
+			, data: global.mock.data.architecture
+		});
+		var iterator;
+
+		iterator = datatable.createIterator();
+		throws(
+			function() {iterator.addFilterRule();}
+			, global.DatatableJs.lib.Exception
+			, 'Iterator::addFilterRule() // Cannot create an empty filter rule'
+		);
+
+		iterator = datatable.createIterator();
+		throws(
+			function() {iterator.addFilterRule({});}
+			, global.DatatableJs.lib.Exception
+			, 'Iterator::addFilterRule(Object {}) // Cannot create an empty filter rule'
+		);
+
+		iterator = datatable.createIterator();
+		throws(
+			function() {
+				iterator.addFilterRule({comparators: '===', values: 'b'})
+			}
+			, global.DatatableJs.lib.Exception
+			, 'Iterator::addFilterRule(Object {comparators, values}) // Cannot create a filter rule without fields'
+		);
+
+		iterator = datatable.createIterator();
+		throws(
+			function() {
+				iterator.addFilterRule({fields: 'col1', values: 'b'})
+			}
+			, global.DatatableJs.lib.Exception
+			, 'Iterator::addFilterRule(Object {fields, values}) // Cannot create a filter rule without comparators'
+		);
+
+		iterator = datatable.createIterator();
+		throws(
+			function() {
+				iterator.addFilterRule({fields: 'col1', comparators: '==='})
+			}
+			, global.DatatableJs.lib.Exception
+			, 'Iterator::addFilterRule(Object {fields, comparators}) // Cannot create a filter rule without values'
+		);
+
+		iterator = datatable.createIterator();
+		throws(
+			function() {
+				iterator.addFilterRule({fields: 'col1', comparators: '==='})
+			}
+			, global.DatatableJs.lib.Exception
+			, 'Iterator::addFilterRule(Object {fields, comparators}) // Cannot create a filter rule with invalid property values'
+		);
+
+		iterator = datatable.createIterator();
+		ok(
+			iterator.addFilterRule({fields: '1', comparators: '1', values: '1'}) instanceof global.DatatableJs.lib.Iterator
+			&& 1 === iterator._filters.length
+			, 'Iterator::addFilterRule(Object {fields, comparators, values}) // Simple filter creation successful'
+		);
+
+		ok(
+			iterator.clearFilterRules() instanceof global.DatatableJs.lib.Iterator
+			&& 0 === iterator._filters.length
+			, 'Iterator::clearFilterRules()'
+		);
+
+		ok(
+			iterator.setFilterRules([
+				{fields: '1', comparators: '1', values: '1'}
+				, {fields: '2', comparators: '2', values: '2'}
+			]) instanceof global.DatatableJs.lib.Iterator
+			&& 2 === iterator._filters.length
+			, 'Iterator::setFilterRules(Array [Object {fields, comparators, values}])'
+		);
+
+	});
+
+
+	//
+	// Sort Rule API
+	//
+	test('Iterator Sort Rule API', function() {
+		var datatable = new global.DatatableJs({
+			schema: global.mock.schema.architecture
+			, data: global.mock.data.architecture
+		});
+		var iterator;
+
+		iterator = datatable.createIterator();
+		throws(
+			function() {iterator.addSortRule();}
+			, global.DatatableJs.lib.Exception
+			, 'Iterator::addSortRule() // Cannot create an empty sort rule'
+		);
+
+		iterator = datatable.createIterator();
+		throws(
+			function() {iterator.addSortRule({});}
+			, global.DatatableJs.lib.Exception
+			, 'Iterator::addSortRule(Object {}) // Cannot create an empty sort rule'
+		);
+
+		iterator = datatable.createIterator();
+		throws(
+			function() {
+				iterator.addSortRule({direction: 'desc', comparator: function(a, b) {return 0;}, transformer: function(a) {return a;}})
+			}
+			, global.DatatableJs.lib.Exception
+			, 'Iterator::addSortRule(Object {direction, comparator, transformer}) // Cannot create a sort rule without a column'
+		);
+
+		iterator = datatable.createIterator();
+		ok(
+			iterator.addSortRule({column: 'a'}) instanceof global.DatatableJs.lib.Iterator
+			&& 1 === iterator._sorts.length
+			, 'Iterator::addSortRule(Object {column}) // Can create a sort rule with only a column'
+		);
+
+		ok(
+			iterator.clearSortRules() instanceof global.DatatableJs.lib.Iterator
+			&& 0 === iterator._sorts.length
+			, 'Iterator::clearSortRules()'
+		);
+
+		ok(
+			iterator.setSortRules([
+				  {column: 'a', direction: 'desc', comparator: function(a, b) {return 0;}, transformer: function(a) {return a;}}
+				, {column: 'b', direction: 'desc', comparator: function(a, b) {return 0;}, transformer: function(a) {return a;}}
+			]) instanceof global.DatatableJs.lib.Iterator
+			&& 2 === iterator._sorts.length
+			, 'Iterator::setSortRules(Array [Object {column, direction, comparator, transformer}])'
+		);
+	});
+
+
+	//
+	// Sort Rule API
+	//
+	test('Iterator Pagination Rule API', function() {
+		var datatable = new global.DatatableJs({
+			schema: global.mock.schema.architecture
+			, data: global.mock.data.architecture
+		});
+		var iterator;
+
+		iterator = datatable.createIterator();
+		throws(
+			function() {iterator.setPaginationRule();}
+			, global.DatatableJs.lib.Exception
+			, 'Iterator::setPaginationRule() // Cannot create an empty pagination rule'
+		);
+
+		iterator = datatable.createIterator();
+		throws(
+			function() {iterator.setPaginationRule({});}
+			, global.DatatableJs.lib.Exception
+			, 'Iterator::setPaginationRule(Object {}) // Cannot create an empty pagination rule'
+		);
+
+		iterator = datatable.createIterator();
+		ok(
+			iterator.setPaginationRule({enabled: true}) instanceof global.DatatableJs.lib.Iterator
+			&& true === iterator._pagination.enabled
+			&& iterator.setPaginationRule({rows_per_page: 1}) instanceof global.DatatableJs.lib.Iterator
+			&& 1 === iterator._pagination.rows_per_page
+			&& iterator.setPaginationRule({current_page: 1}) instanceof global.DatatableJs.lib.Iterator
+			&& 1 === iterator._pagination.current_page
+			, 'Iterator::setPaginationRule(Object {...}) // Pagination rules only require one option'
+		);
+
+		iterator = datatable.createIterator();
+		ok(
+			iterator.setPaginationRule({enabled: true, rows_per_page: 2, current_page: 2}) instanceof global.DatatableJs.lib.Iterator
+			&& true === iterator._pagination.enabled
+			&& 2 === iterator._pagination.rows_per_page
+			&& 2 === iterator._pagination.current_page
+			, 'Iterator::setPaginationRule(Object {enabled, rows_per_page, current_page})'
+		);
+
+		ok(
+			iterator.setPage(1) instanceof global.DatatableJs.lib.Iterator
+			&& 1 === iterator._pagination.current_page
+			, 'Iterator::setPage(Number current_page)'
+		);
+
+		ok(
+			1 === iterator.getPage()
+			, 'Iterator::getPage()'
+		);
+
+		ok(
+			iterator.setRowsPerPage(1) instanceof global.DatatableJs.lib.Iterator
+			&& 1 === iterator._pagination.rows_per_page
+			, 'Iterator::setRowsPerPage(Number rows_per_page)'
+		);
+
+		ok(
+			1 === iterator.getRowsPerPage()
+			, 'Iterator::getRowsPerPage()'
+		);
+
+		ok(
+			iterator.setPaginationEnabled(false) instanceof global.DatatableJs.lib.Iterator
+			&& false === iterator._pagination.enabled
+			, 'Iterator::setPaginationEnabled(Boolean enabled)'
+		);
+
+		ok(
+			false === iterator.getPaginationEnabled()
+			, 'Iterator::getPaginationEnabled()'
+		);
+
+	});
+
+
+	//
+	// Data Access API
+	//
+	test('Iterator Data Access API', function() {
+		var datatable = new global.DatatableJs({
+			data: global.mock.data.data_access_api_test
+		});
+		var iterator;
+		var a = 0;
+		var data;
+
+		iterator = datatable.createIterator();
+		while (data = iterator.next()) {
+			ok(
+				a === data.id
+				, 'Iterator::next() (value = '+a+')'
+			);
+			ok(
+				a === iterator.curr().id
+				, 'Iterator::curr() (value = '+a+')'
+			);
+			a++;
+		}
+
+		a = iterator.length;
+		while (data = iterator.prev()) {
+			a--;
+			ok(
+				a === data.id
+				, 'Iterator::prev() (value = '+a+')'
+			);
+			ok(
+				a === iterator.curr().id
+				, 'Iterator::curr() (value = '+a+')'
+			);
+		}
+
+		// Remove the current row from both the Iterator and the parent Data
+		// object
+		iterator.next();
+		ok(
+			5 === iterator.datatable_instance.getRows().length
+			&& 5 === iterator.getRows().length
+			&& 0 === iterator.datatable_instance.getRows()[0].id
+			&& 0 === iterator.curr().id
+			&& iterator.remove() instanceof global.DatatableJs.lib.Iterator
+			&& 4 === iterator.datatable_instance.getRows().length
+			&& 4 === iterator.getRows().length
+			&& 1 === iterator.datatable_instance.getRows()[0].id
+			&& 1 === iterator.curr().id
+			, 'Iterator::remove()'
+		);
+	});
+
+
+	//
+	// Data Management Tests
+	//
+	test('Data Management Tests', function() {
+		var datatable = new global.DatatableJs({
+			data: global.mock.data.real_world
+		});
+		var iterator;
+		var a = 0;
+		var data;
+
+		ok(
+			50 === datatable.getRows().length
+			&& datatable.setSchema(global.mock.schema.real_world)
+			&& 40 === datatable.getRows().length
+			, 'DatatableJs::setSchema() removes existing invalid rows'
+		);
+
+
+		// adding a row with no schema
+
+		// adding a valid row with valid schema
+
+		// adding a row with invalid data type based on the schema
+
+		// adding a row missing a column required by the schema
+
+		// adding a row with a column not defined in the schema
+
+
+
+//		iterator = datatable.createIterator();
+//		while (data = iterator.next()) {
+//			console.log(data.id);
+//			a++; if (a > 55) {throw 'stop';}
+//		}
 	});
 
 }(this);

@@ -126,7 +126,7 @@
 		for (var column in columns) {if (columns.hasOwnProperty(column)) {
 			ret_val = this.isValidData(column, row[column]);
 			if (!ret_val) {
-				global.console.error('DatatableJs.lib.Schema: "'+column+'" value is invalid', row[column], columns[column].getDefinition());
+				global.DatatableJs.console.error('DatatableJs.lib.Schema: "'+column+'" value is invalid', row[column], columns[column].getDefinition());
 				break;
 			}
 		}}
