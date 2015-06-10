@@ -466,12 +466,7 @@
 				}
 			}
 
-			this.shadow_instance.getRows().sort(function(a, b) {
-				var ret_val = 0;
-				if (a.__pos__ < b.__pos__) {ret_val = -1;}
-				if (a.__pos__ > b.__pos__) {ret_val = 1;}
-				return ret_val;
-			});
+			this.shadow_instance.getData().sort('__pos__', 'asc');
 
 			this._is_sorted = true;
 		}
