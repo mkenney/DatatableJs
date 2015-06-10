@@ -75,8 +75,8 @@
 				, {col1: 'b', col2: 2, col3: {a:  2 }, col4: [2, 3], col5: false}
 				, {col1:  1 , col2: 3, col3: {a: 'a'}, col4: [3, 4], col5: true }
 			]
-			, additional_rows: [
-				  {col1: 'a', col2: 1, col3: {a: '1'}, col4: [1, 2], col5: true } // Valid row
+			, additional_architecture: [
+				  {col1: 'c', col2: 1, col3: {a: '1'}, col4: [1, 2], col5: true } // Valid row
 				, {col1: 0,   col2: 1, col3: {a: '1'}, col4: [1, 2], col5: true } // Bad col1 data
 				, {col1: 0, col2: 'a', col3: {a: '1'}, col4: [1, 2], col5: true } // Bad col2 data
 				, {col2: 1, col3: {a: '1'}, col4: [1, 2], col5: true } // Missing non-nullable col1 column

@@ -297,7 +297,7 @@
 			, 'Data::setRows(Array \'rows\')'
 		);
 		ok(
-			data.addRow(global.mock.data.architecture[0]) instanceof global.DatatableJs.lib.Data
+			data.addRow(global.mock.data.additional_architecture[0]) instanceof global.DatatableJs.lib.Data
 			&& 4 === data._rows.length
 			, 'Data::addRow(Object \'row\')'
 		);
@@ -506,25 +506,25 @@
 		});
 
 		ok(
-			datatable.addRow(global.mock.data.additional_rows[0])
+			datatable.addRow(global.mock.data.additional_architecture[0])
 			&& 3 === datatable.getData().getRows().length
 			, 'DatatableJs::addRow(Object {data row}) // Valid data'
 		);
 
 		ok(
-			datatable.addRow(global.mock.data.additional_rows[1])
+			datatable.addRow(global.mock.data.additional_architecture[1])
 			&& 3 === datatable.getData().getRows().length
 			, 'DatatableJs::addRow(Object {data row}) // Incorrect col1 data type'
 		);
 
 		ok(
-			datatable.addRow(global.mock.data.additional_rows[2])
+			datatable.addRow(global.mock.data.additional_architecture[2])
 			&& 3 === datatable.getData().getRows().length
 			, 'DatatableJs::addRow(Object {data row}) // Incorrect col2 data type'
 		);
 
 		ok(
-			datatable.addRow(global.mock.data.additional_rows[3])
+			datatable.addRow(global.mock.data.additional_architecture[3])
 			&& 3 === datatable.getData().getRows().length
 			, 'DatatableJs::addRow(Object {data row}) // Missing non-nullable col1 data'
 		);
@@ -550,40 +550,6 @@
 		ok(
 			datatable.setSchema(new global.DatatableJs.lib.Schema()) instanceof global.DatatableJs
 			, 'DatatableJs::setSchema(Schema schema)'
-		);
-
-		/////////////////////////////////////////
-		// Execute Iterator related tests last //
-		/////////////////////////////////////////
-
-		var datatable = new global.DatatableJs({
-			schema: global.mock.schema.architecture
-			, data: global.mock.data.architecture
-		});
-
-		ok(
-			datatable.createIterator() instanceof global.DatatableJs.lib.Iterator
-			, 'DatatableJs::createIterator()'
-		);
-
-		ok(
-			datatable.getRow({col1: 'b'}) === datatable.getData().getRows()[1]
-			&& datatable.getRow({col1: 'b'}) instanceof Object
-			&& !(datatable.getRow({col1: 'b'}) instanceof Array)
-			, 'DatatableJs::getRow(Object {filter}) // Matching 1 row'
-		);
-
-		ok(
-			datatable.addRow(global.mock.data.additional_rows[0])
-			&& datatable.getRow({col1: 'a'}) === datatable.getData().getRows()[0]
-			&& datatable.getRow({col1: 'a'}) instanceof Object
-			&& !(datatable.getRow({col1: 'a'}) instanceof Array)
-			, 'DatatableJs::getRow(Object {filter}) // Matching multiple rows, only the first one is returned'
-		);
-
-		ok(
-			undefined === datatable.getRow({col1: 'c'})
-			, 'DatatableJs::getRow(Object {filter}) // Matching 0 rows'
 		);
 	});
 
@@ -937,24 +903,7 @@
 				, 'Iterator::curr() (value = '+a+')'
 			);
 		}
-
-		// Remove the current row from both the Iterator and the parent Data
-		// object
-		iterator.next();
-		ok(
-			5 === iterator.datatable_instance.getRows().length
-			&& 5 === iterator.getRows().length
-			&& 0 === iterator.datatable_instance.getRows()[0].id
-			&& 0 === iterator.curr().id
-			&& iterator.remove() instanceof global.DatatableJs.lib.Iterator
-			&& 4 === iterator.datatable_instance.getRows().length
-			&& 4 === iterator.getRows().length
-			&& 1 === iterator.datatable_instance.getRows()[0].id
-			&& 1 === iterator.curr().id
-			, 'Iterator::remove()'
-		);
 	});
-
 
 	//
 	// Data Management Tests
@@ -971,7 +920,7 @@
 			50 === datatable.getRows().length
 			&& datatable.setSchema(global.mock.schema.real_world)
 			&& 40 === datatable.getRows().length
-			, 'DatatableJs::setSchema() removes existing invalid rows'
+			, 'DatatableJs::setSchema(Schema {schema}) // remove existing invalid rows'
 		);
 
 
@@ -987,11 +936,73 @@
 
 
 
-//		iterator = datatable.createIterator();
-//		while (data = iterator.next()) {
-//			console.log(data.id);
-//			a++; if (a > 55) {throw 'stop';}
-//		}
+		////////////////////////////////////////
+		// Iterator related DatatableJs tests //
+		////////////////////////////////////////
+
+		var datatable = new global.DatatableJs({
+			schema: global.mock.schema.architecture
+			, data: global.mock.data.architecture
+		});
+
+		ok(
+			datatable.createIterator() instanceof global.DatatableJs.lib.Iterator
+			, 'DatatableJs::createIterator()'
+		);
+
+		ok(
+			datatable.getRow({col1: 'b'}) === datatable.getData().getRows()[1]
+			&& datatable.getRow({col1: 'b'}) instanceof Object
+			&& !(datatable.getRow({col1: 'b'}) instanceof Array)
+			, 'DatatableJs::getRow(Object {filter}) // Matching 1 row'
+		);
+
+		ok(
+			datatable.addRow(global.mock.data.additional_architecture[0])
+			&& datatable.getRow({col1: 'a'}) === datatable.getData().getRows()[0]
+			&& datatable.getRow({col1: 'a'}) instanceof Object
+			&& !(datatable.getRow({col1: 'a'}) instanceof Array)
+			, 'DatatableJs::getRow(Object {filter}) // Matching multiple rows, only the first one is returned'
+		);
+
+		ok(
+			undefined === datatable.getRow({col1: 'd'})
+			, 'DatatableJs::getRow(Object {filter}) // Matching 0 rows'
+		);
+
+		iterator = datatable.createIterator();
+		iterator.addFilterRule({
+			fields: 'col1'
+			, comparators: '=='
+			, values: 'a'
+		});
+		ok(
+			datatable.splice(iterator) instanceof global.DatatableJs
+			&& 2 === datatable.getRows().length
+			&& 'b' === datatable.getRows()[0].col1
+			, 'DatatableJs::splice(Iterator {iterator}) // Matching 2 rows'
+		);
+
+
+		// Remove the current row from both the Iterator and the parent Data
+		// object
+		datatable = new global.DatatableJs({
+			data: global.mock.data.data_access_api_test
+		});
+		iterator = datatable.createIterator();
+		iterator.next();
+		ok(
+			5 === iterator.datatable_instance.getRows().length
+			&& 5 === iterator.getRows().length
+			&& 0 === iterator.datatable_instance.getRows()[0].id
+			&& 0 === iterator.curr().id
+			&& iterator.remove() instanceof global.DatatableJs.lib.Iterator
+			&& 4 === iterator.datatable_instance.getRows().length
+			&& 4 === iterator.getRows().length
+			&& 1 === iterator.datatable_instance.getRows()[0].id
+			&& 1 === iterator.curr().id
+			, 'Iterator::remove()'
+		);
 	});
 
 }(this);

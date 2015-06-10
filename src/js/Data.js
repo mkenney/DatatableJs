@@ -41,6 +41,12 @@
 	};
 
 	/**
+	 * Default value for the is_shaow flag
+	 * @type {Boolean}
+	 */
+	Data.prototype._is_shadow = false;
+
+	/**
 	 * Initialize
 	 *
 	 * @param  {Object} rows Optional, an object containing named DatatableJs.lib.Column instances
@@ -121,8 +127,12 @@
 						__pos__ = val;
 					}
 				});
+			}
+
+			if (!this.isShadow()) {
 				row.__pos__ = this._rows.length;
 			}
+
 			this._rows.push(row);
 		}
 
@@ -336,6 +346,23 @@
 			return this._rows.length;
 		}
 	});
+
+	/**
+	 * Get/Set a flag noting whether this is a shadow instance
+	 *
+	 * @param
+	 * @return {DatatableJs.lib.Iterator}
+	 */
+	Data.prototype.isShadow = function(bool) {
+		var ret_val;
+		if ('undefined' !== typeof bool) {
+			this._is_shadow = Boolean(bool);
+			ret_val = this;
+		} else {
+			ret_val = this._is_shadow;
+		}
+		return ret_val;
+	};
 
 	global.DatatableJs.lib.Data = Data;
 

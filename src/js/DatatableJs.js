@@ -59,6 +59,12 @@
 	DatatableJs.prototype.lib = DatatableJs.lib;
 
 	/**
+	 * Default value for the is_shaow flag
+	 * @type {Boolean}
+	 */
+	DatatableJs.prototype._is_shadow = false;
+
+	/**
 	 * Initialize
 	 *
 	 * @param  {DatatableJs.lib.Schema}     schema Optional
@@ -81,7 +87,10 @@
 	 * @return {DatatableJs.lib.Data}
 	 */
 	DatatableJs.prototype.getData = function() {
-		if (!(this._data instanceof this.lib.Data)) {this._data = new this.lib.Data();}
+		if (!(this._data instanceof this.lib.Data)) {
+			this._data = new this.lib.Data();
+			this._data.isShadow(this.isShadow());
+		}
 		return this._data;
 	};
 
@@ -99,6 +108,7 @@
 				data = new this.lib.Data();
 				data.setSchema(this.getSchema());
 				data.setRows(rows);
+				data.isShadow(this.isShadow());
 			} else if (!(data instanceof DatatableJs.lib.Data)) {
 				throw new DatatableJs.lib.Exception('The data definition must be an array of data rows or an instance of DatatableJs.lib.Data');
 			}
@@ -136,11 +146,13 @@
 	DatatableJs.prototype.getRow = function(options) {
 		var iterator = this.createIterator();
 		for (var a in options) if (options.hasOwnProperty(a)) {
-			iterator.addFilterRule({
-				fields: a
-				, comparators: '=='
-				, values: options[a]
-			});
+            if (options[a]) {
+                iterator.addFilterRule({
+                    fields: a
+                    , comparators: '=='
+                    , values: options[a]
+                });
+            }
 		}
 		return iterator.next();
 	}
@@ -202,6 +214,42 @@
 	 */
 	DatatableJs.prototype.createIterator = function() {
 		return new this.lib.Iterator(this);
+	};
+
+	/**
+	 * Remove data rows based on an iterator definition
+	 *
+	 * @param  {DatatableJs.lib.Iterator} iterator
+	 * @return {DatatableJs}
+	 */
+	DatatableJs.prototype.splice = function(iterator) {
+		if (!(iterator instanceof this.lib.Iterator)) {throw new DatatableJs.lib.Exception('Splicing the data requires an Iterator for filtering');}
+		iterator.execute();
+		while (iterator.next()) {
+			iterator.remove();
+		}
+		this.getData().indexRows();
+		return this;
+	};
+
+	/**
+	 * Get/Set a flag noting whether this is a shadow instance
+	 *
+	 * @param
+	 * @return {DatatableJs.lib.Iterator}
+	 */
+	DatatableJs.prototype.isShadow = function(bool) {
+		var ret_val;
+		if ('undefined' !== typeof bool) {
+			this._is_shadow = Boolean(bool);
+			if (this._data instanceof this.lib.Data) {
+				this._data.isShadow(this._is_shadow);
+			}
+			ret_val = this;
+		} else {
+			ret_val = this._is_shadow;
+		}
+		return ret_val;
 	};
 
 	global.DatatableJs = DatatableJs;

@@ -27,6 +27,7 @@
 
 		this._shadow_instance = new global.DatatableJs();
 		this._shadow_instance.setSchema(this.datatable_instance.getSchema());
+		this._shadow_instance.isShadow(true);
 
 		/**
 		 * Reference to the last matched row
@@ -561,13 +562,11 @@
 	 * @return {DatatableJs.lib.Iterator}
 	 */
 	Iterator.prototype.remove = function() {
-
 		this.datatable_instance.getRows().splice(this.getRows()[this._iterator_key].__pos__, 1);
 		this.getRows().splice(this._iterator_key, 1);
+		while (this._iterator_key > this.getRows().length) {this._iterator_key--;}
 
-		while (this._iterator_key >= this.getRows().length) {this._iterator_key--;}
 		this.datatable_instance.getData().indexRows();
-
 		this._iterator_value = this.getRows()[this._iterator_key];
 		this._cur_value      = this.getRows()[this._iterator_key];
 		return this;
