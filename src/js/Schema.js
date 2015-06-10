@@ -203,28 +203,32 @@
 		) {
 			ret_val = false;
 		}
-		// Datatype is defined, continue type checking
-		if (ret_val && undefined !== column.get('type')) {
 
-			ret_val = (
-					// Datatype is specified using a string in the schema
-					getType(value) === column.get('type')
-				|| (
-					// Datatype is specified as a function reference but the
-					// actual value is probably a primitive
-					'Function' === getType(column.get('type'))
-					&& getType(value) === column.get('type').name
-				)
-				|| (
-					// Datatype is specified as a function reference for instance
-					// checks
-					'Function' === getType(column.get('type'))
-					&& (value instanceof column.get('type'))
-				)
-			);
-		}
+        // Datatype is defined, continue type checking
+        if (
+            ret_val
+            && null !== value
+            && undefined !== value
+            && '' !== value
+            && undefined !== column.get('type')) {
 
-
+            ret_val = (
+                    // Datatype is specified using a string in the schema
+                    getType(value) === column.get('type')
+                || (
+                    // Datatype is specified as a function reference but the
+                    // actual value is probably a primitive
+                    'Function' === getType(column.get('type'))
+                    && getType(value) === column.get('type').name
+                )
+                || (
+                    // Datatype is specified as a function reference for instance
+                    // checks
+                    'Function' === getType(column.get('type'))
+                    && (value instanceof column.get('type'))
+                )
+            );
+        }
 
 		/*
 			//ret_val = (

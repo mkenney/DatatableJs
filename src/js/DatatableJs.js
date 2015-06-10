@@ -89,6 +89,7 @@
 	DatatableJs.prototype.getData = function() {
 		if (!(this._data instanceof this.lib.Data)) {
 			this._data = new this.lib.Data();
+			this._data.setSchema(this.getSchema());
 			this._data.isShadow(this.isShadow());
 		}
 		return this._data;
