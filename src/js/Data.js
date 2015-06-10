@@ -269,34 +269,34 @@
 			}
 
 			// Sort the data set
-			this._rows.sort(function(a, b) {
-				var ret_val = 0;
-				var a_val = a[column];
-				var b_val = b[column];
+            this._rows.sort(function(a, b) {
+                var ret_val = 0;
+                var a_val = a[column];
+                var b_val = b[column];
 
-				// Sort rows missing data to the "bottom"
-				if ((undefined === a[column] || null === a[column]) && a[column] !== b[column]) {
-					ret_val = 1;
+                // Perform any specified pre-comparison transformations
+                if (undefined !== transformer) {
+                    a_val = transformer(a_val);
+                    b_val = transformer(b_val);
+                }
 
-				} else if ((undefined === b[column] || null === b[column]) && a[column] !== b[column]) {
-					ret_val = -1;
+                // Sort rows missing data to the "bottom"
+                if ((undefined === a_val || null === a_val || '' === a_val) && a_val !== b_val) {
+                    ret_val = 1;
 
-				// Maintain relative position when values are equal to allow
-				// multi-column sorting
-				} else if (a[column] === b[column]) {
-					ret_val = a.__pos__ - b.__pos__;
+                } else if ((undefined === b_val || null === b_val || '' === b_val) && a_val !== b_val) {
+                    ret_val = -1;
 
-				} else {
-					// Perform any specified pre-comparison transformations
-					if (undefined !== transformer) {
-						a_val = transformer(a_val);
-						b_val = transformer(b_val);
-					}
+                // Maintain relative position when values are equal to allow
+                // multi-column sorting
+                } else if (a_val === b_val) {
+                    ret_val = a.__pos__ - b.__pos__;
 
-					ret_val = comparator(a_val, b_val);
-				}
-				return ret_val;
-			});
+                } else {
+                    ret_val = comparator(a_val, b_val);
+                }
+                return ret_val;
+            });
 
 			if ('desc' === direction) {
 				this._rows.reverse();
