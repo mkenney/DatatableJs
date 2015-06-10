@@ -25,9 +25,9 @@
 
 		this.datatable_instance = datatable_instance;
 
-		this._shadow_instance = new global.DatatableJs();
-		this._shadow_instance.setSchema(this.datatable_instance.getSchema());
-		this._shadow_instance.isShadow(true);
+		this.shadow_instance = new global.DatatableJs();
+		this.shadow_instance.setSchema(this.datatable_instance.getSchema());
+		this.shadow_instance.isShadow(true);
 
 		/**
 		 * Reference to the last matched row
@@ -136,7 +136,7 @@
 	 */
 	Iterator.prototype.getData = function() {
 		this.applyFilterRules();
-		return this._shadow_instance.getData();
+		return this.shadow_instance.getData();
 	};
 
 	/**
@@ -146,7 +146,7 @@
 	 */
 	Iterator.prototype.getRows = function() {
 		this.applyFilterRules();
-		return this._shadow_instance.getRows();
+		return this.shadow_instance.getRows();
 	};
 
 	/**
@@ -434,13 +434,13 @@
 	 */
 	Iterator.prototype.applyFilterRules = function() {
 		if (!this._is_filtered) {
-			this._shadow_instance.getData().truncate();
+			this.shadow_instance.getData().truncate();
 			for (var a = 0; a < this.datatable_instance.getRows().length; a++) {
 				if (
 					this.datatable_instance.getRows()[a]
 					&& this.rowMatches(this.datatable_instance.getRows()[a])
 				) {
-					this._shadow_instance.addRow(this.datatable_instance.getRows()[a]);
+					this.shadow_instance.addRow(this.datatable_instance.getRows()[a]);
 				}
 			}
 			this._is_filtered = true;
@@ -466,7 +466,7 @@
 				}
 			}
 
-			this._shadow_instance.getRows().sort(function(a, b) {
+			this.shadow_instance.getRows().sort(function(a, b) {
 				var ret_val = 0;
 				if (a.__pos__ < b.__pos__) {ret_val = -1;}
 				if (a.__pos__ > b.__pos__) {ret_val = 1;}
@@ -482,8 +482,8 @@
 		if (!this._is_sorted) {
 			this.applySortRules();
 		} else {
-			this.datatable_instance.sort();
-			this.shadow_instance.sort();
+			this.datatable_instance.getData().sort();
+			this.shadow_instance.getData().sort();
 		}
 		return this;
 	}
@@ -698,7 +698,7 @@
 		}
 		, get: function() {
 			this.applyFilterRules();
-			return this._shadow_instance.getRows().length
+			return this.shadow_instance.getRows().length
 		}
 	});
 
