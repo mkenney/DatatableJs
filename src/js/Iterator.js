@@ -478,6 +478,16 @@
 		return this;
 	}
 
+	Iterator.prototype.sort = function() {
+		if (!this._is_sorted) {
+			this.applySortRules();
+		} else {
+			this.datatable_instance.sort();
+			this.shadow_instance.sort();
+		}
+		return this;
+	}
+
 	Iterator.prototype.getMinRow = function() {
 		var min_page_row = 0;
 		if (this._pagination.enabled) {
