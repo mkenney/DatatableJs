@@ -1,7 +1,7 @@
 {
 	"name": "DatatableJs"
 	, "description": "A library for manipulating and filtering tabular data"
-	, "version": "0.4.8"
+	, "version": "0.4.9"
 	, "keywords": [
 		"DatatableJs"
 		, "js"

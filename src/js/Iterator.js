@@ -227,6 +227,15 @@
 	};
 
 	/**
+	 * Get the current set of filter rules
+	 *
+	 * @return {Array}
+	 */
+	Iterator.prototype.getFilterRules = function() {
+		return this._filters;
+	};
+
+	/**
 	 * Add a sorting rule.  Supports a stable multi-sort.
 	 * Resets the executed flag to false...
 	 * @param  {Object}                 sort
@@ -262,6 +271,16 @@
 		this._sorts = [];
 		this._is_sorted = false;
 		return this;
+	};
+
+	/**
+	 * Get the current set of sorting rules
+	 *
+	 * @param  {Array}                   sort
+	 * @return {DatatableJs.lib.Iterator}
+	 */
+	Iterator.prototype.getSortRules = function() {
+		return this._sorts;
 	};
 
 	/**
