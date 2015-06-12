@@ -214,6 +214,10 @@
 		if (reverse_direction) {
 			this._rows.reverse();
 
+			// Update row position tracking for future sorts to allow multi-column
+			// sorting
+			this.indexRows();
+
 		// Continue defining sort logic and execute
 		} else {
 
