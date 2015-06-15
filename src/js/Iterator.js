@@ -29,6 +29,8 @@
 		this.shadow_instance.setSchema(this.datatable_instance.getSchema());
 		this.shadow_instance.isShadow(true);
 
+		this.shadow_index = [];
+
 		/**
 		 * Reference to the last matched row
 		 * @private
@@ -454,12 +456,14 @@
 	Iterator.prototype.applyFilterRules = function() {
 		if (!this._is_filtered) {
 			this.shadow_instance.getData().truncate();
+			this.shadow_index = [];
 			for (var a = 0; a < this.datatable_instance.getRows().length; a++) {
 				if (
 					this.datatable_instance.getRows()[a]
 					&& this.rowMatches(this.datatable_instance.getRows()[a])
 				) {
 					this.shadow_instance.addRow(this.datatable_instance.getRows()[a]);
+					this.shadow_index.push(this.datatable_instance.getRows()[a].__pos__);
 				}
 			}
 			this._is_filtered = true;
@@ -586,8 +590,9 @@
 	 * @return {DatatableJs.lib.Iterator}
 	 */
 	Iterator.prototype.remove = function() {
-		this.datatable_instance.getRows().splice(this.getRows()[this._iterator_key].__pos__, 1);
+		this.datatable_instance.getRows().splice(this.shadow_index[this._iterator_key], 1);
 		this.getRows().splice(this._iterator_key, 1);
+		this.shadow_index.splice(this._iterator_key, 1);
 		while (this._iterator_key > this.getRows().length) {this._iterator_key--;}
 
 		this.datatable_instance.getData().indexRows();
