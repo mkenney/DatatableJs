@@ -294,7 +294,11 @@
                 // Maintain relative position when values are equal to allow
                 // multi-column sorting
                 } else if (a_val === b_val) {
-                    ret_val = a.__pos__ - b.__pos__;
+                    if ('asc' === direction) {
+                        ret_val = a.__pos__ - b.__pos__;
+                    } else {
+                        ret_val = b.__pos__ - a.__pos__;
+                    }
 
                 } else {
                     ret_val = comparator(a_val, b_val);

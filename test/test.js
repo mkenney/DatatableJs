@@ -363,14 +363,15 @@
 				if (a < b) {return 1;}
 			}
 			, function(a) {                // Transform the values to reverse the
-				if ('1' === a) {return 2;} // sort order again, correcting the
-				if ('3' === a) {return 1;} // behavior
-				return 0;
+				if ('b' === a) {return 2;} // sort order again, correcting the
+				if ('a' === a) {return 1;} // behavior
+				return 3; // This sorts the value 1 to the bottom
 			}
 		);
+
 		ok(
-			'b' === data.getRows()[0].col1
-			&& 'a' === data.getRows()[1].col1
+			'a' === data.getRows()[0].col1
+			&& 'b' === data.getRows()[1].col1
 			, 'Data::sort(String \'column\', String \'direction\' "desc", Function \'comparator\', Function \'transformer\') // Custom comparison function and custom pre-comparison data transformation'
 		);
 
