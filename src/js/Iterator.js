@@ -721,6 +721,80 @@
 		}
 	});
 
+
+	Iterator.prototype['export'] = function(as, filename) {
+		var self = this;
+		var separator;
+		var data = [];
+		var row = [];
+		var a;
+		var b;
+		var data_rows = self.applyFilterRules().getRows();
+		var cell_data;
+		var file_data = [];
+		var file_blob;
+		var file_url;
+		var file_link;
+		var mime_type;
+
+		if (!filename) {
+			filename = 'export';
+		}
+
+		switch (String(as).toLowerCase()) {
+			default:
+			case 'csv':
+				as = 'csv';
+				separator = ',';
+				mime_type = 'text/csv';
+			break;
+
+			case 'tdt':
+			case 'tsv':
+			case 'txt':
+				separator = '	';
+				mime_type = 'text/tab-separated-values';
+			break;
+		}
+
+		for (a in data_rows[0]) if (data_rows[0].hasOwnProperty(a)) {
+			row.push(a);
+		}
+		data.push(row);
+
+		for (a = 0; a < data_rows.length; a++) {
+			row = [];
+			for (b in data_rows[a]) if (data_rows[a].hasOwnProperty(b)) {
+
+				if (data_rows[a][b] instanceof Array) {
+					cell_data = data_rows[a][b].join(', ');
+
+				} else if (Object === data_rows[a][b].prototype) {
+					cell_data = global.JSON.stringify(data_rows[a][b]);
+
+				} else {
+					cell_data = data_rows[a][b];
+				}
+
+				row.push(cell_data);
+			}
+			data.push(row);
+		}
+
+		for (a = 0; a < data.length; a++) {
+			file_data.push('"'+data[a].join('"'+separator+'"')+'"');
+		}
+
+		file_blob = new Blob([file_data.join("\n")], {type: mime_type});
+		file_url = window.URL.createObjectURL(file_blob);
+		file_link = document.createElement('a');
+
+		file_link.href = file_url;
+		file_link.setAttribute('download', filename+'.'+as);
+		file_link.click();
+	}
+
+
 	global.DatatableJs.lib.Iterator = Iterator;
 
 }(this);
