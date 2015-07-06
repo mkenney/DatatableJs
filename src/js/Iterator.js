@@ -721,7 +721,14 @@
 		}
 	});
 
-
+	/**
+	 * Download the data as a CSV or Tab-delimited text file
+	 * @param  {String}   as       The file export format, accepts 'tdt', 'tsv' and
+	 *                             'txt' for tab-delmited and 'csv' for comma-separated.
+	 *                             This is also the default file extension.
+	 * @param  {String}   filename The default file name, excluding the file extension
+	 * @return {DatatableJs.lib.Iterator}
+	 */
 	Iterator.prototype['export'] = function(as, filename) {
 		var self = this;
 		var separator;
@@ -752,7 +759,9 @@
 			case 'tdt':
 			case 'tsv':
 			case 'txt':
-				separator = '	';
+				// jscs:disable validateQuoteMarks
+				separator = "\t";
+				// jscs:enable
 				mime_type = 'text/tab-separated-values';
 			break;
 		}
@@ -767,7 +776,7 @@
 			for (b in data_rows[a]) if (data_rows[a].hasOwnProperty(b)) {
 
 				if (data_rows[a][b] instanceof Array) {
-					cell_data = data_rows[a][b].join(', ');
+					cell_data = data_rows[a][b].join(',');
 
 				} else if (Object === data_rows[a][b].prototype) {
 					cell_data = global.JSON.stringify(data_rows[a][b]);
@@ -785,15 +794,26 @@
 			file_data.push('"'+data[a].join('"'+separator+'"')+'"');
 		}
 
-		file_blob = new Blob([file_data.join("\n")], {type: mime_type});
+		file_blob = new Blob(
+			[
+				// jscs:disable validateQuoteMarks
+				file_data.join("\n")
+				// jscs:enable
+			]
+			, {
+				type: mime_type
+			}
+		);
+
 		file_url = window.URL.createObjectURL(file_blob);
 		file_link = document.createElement('a');
 
 		file_link.href = file_url;
 		file_link.setAttribute('download', filename+'.'+as);
 		file_link.click();
-	}
 
+		return self;
+	}
 
 	global.DatatableJs.lib.Iterator = Iterator;
 
