@@ -80,6 +80,21 @@
 	};
 
 	/**
+	 * Deep-copy the current instance and return the result.  Do this when you
+	 * need to avoid conflicts when sharing a dataset among multiple independent
+	 * processes.
+	 *
+	 * @return {DatatableJs}
+	 */
+	DatatableJs.prototype.clone = function() {
+		var data_copy = JSON.parse(JSON.stringify(this.getRows()));
+		return new DatatableJs({
+			  data: data_copy
+			, schema: this.getSchema()
+		}).isShadow(this.isShadow());
+	};
+
+	/**
 	 * Get the current DatatableJs.lib.Data instance
 	 *
 	 * If an instance doesn't exist or is invalid one will be created
