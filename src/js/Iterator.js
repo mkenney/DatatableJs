@@ -39,7 +39,7 @@
 		this._cur_value = undefined;
 
 		/**
-		 * An array of Object instances defining iterators
+		 * An array of Object instances defining filters
 		 * @private
 		 * @type {Array} An array of simple objects that are combined to create a filter rule:
 		 *       {
