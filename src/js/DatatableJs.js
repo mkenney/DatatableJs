@@ -3,6 +3,125 @@
 	'use strict';
 
 	/**
+	 * Privately scoped environment data
+	 *
+	 * @private
+	 */
+	var ENV = {};
+
+	/**
+	 * Define log levels
+	 *
+	 * @type {Array}
+	 */
+	ENV.log_levels = [
+		'trace'   // 0
+		, 'debug' // 1
+		, 'info'  // 2
+		, 'warn'  // 3
+		, 'error' // 4
+		, 'off'   // 5
+	];
+
+	/**
+	 * Store the current log level
+	 *
+	 * @type {Number}
+	 */
+	ENV.log_level = ENV.log_levels.indexOf('info');
+
+	/**
+	 * This library uses console messages to provide non-fatal error feedback,
+	 * make sure those methods exist in all environments.
+	 *
+	 * @type {Console}
+	 */
+	ENV.console = global.console;
+	if (!ENV.console)                {ENV.console = {};}
+	if (!ENV.console.assert)         {ENV.console.assert         = function() {};}
+	if (!ENV.console.count)          {ENV.console.count          = function() {};}
+	if (!ENV.console.dir)            {ENV.console.dir            = function() {};}
+	if (!ENV.console.error)          {ENV.console.error          = function() {};}
+	if (!ENV.console.group)          {ENV.console.group          = function() {};}
+	if (!ENV.console.groupCollapsed) {ENV.console.groupCollapsed = function() {};}
+	if (!ENV.console.groupEnd)       {ENV.console.groupEnd       = function() {};}
+	if (!ENV.console.info)           {ENV.console.info           = function() {};}
+	if (!ENV.console.log)            {ENV.console.log            = function() {};}
+	if (!ENV.console.time)           {ENV.console.time           = function() {};}
+	if (!ENV.console.timeEnd)        {ENV.console.timeEnd        = function() {};}
+	if (!ENV.console.trace)          {ENV.console.trace          = function() {};}
+	if (!ENV.console.warn)           {ENV.console.warn           = function() {};}
+
+	/**
+	 * Map of console methods to log level values
+	 *
+	 * @type {Object}
+	 */
+	ENV.console_levels = {};
+	ENV.console_levels.assert         = 0;
+	ENV.console_levels.count          = 0;
+	ENV.console_levels.dir            = 0;
+	ENV.console_levels.error          = 4;
+	ENV.console_levels.group          = 2;
+	ENV.console_levels.groupCollapsed = 2;
+	ENV.console_levels.groupEnd       = 2;
+	ENV.console_levels.info           = 2;
+	ENV.console_levels.log            = 1;
+	ENV.console_levels.time           = 1;
+	ENV.console_levels.timeEnd        = 1;
+	ENV.console_levels.trace          = 0;
+	ENV.console_levels.warn           = 3;
+
+	/**
+	 * Get the logging level
+	 *
+	 * Default to 'info'
+	 *
+	 * @return {Number}
+	 */
+	ENV.getLogLevel = function() {
+		if (undefined === ENV.log_levels[Number(ENV.log_level)]) {
+			ENV.setLogLevel('info');
+		}
+		return ENV.log_levels[ENV.log_level];
+	};
+
+	/**
+	 * Set the current DatatableJs.lib.Data instance
+	 *
+	 * @param  {String}      log_level
+	 * @return {DatatableJs}
+	 */
+	ENV.setLogLevel = function(log_level) {
+		if (-1 === ENV.log_levels.indexOf(log_level))   {
+			throw new DatatableJs.lib.Exception('Invalid log level: '+log_level);
+		}
+		ENV.log_level = ENV.log_levels.indexOf(log_level);
+		ENV.buildLogger();
+	};
+
+	/**
+	 * Setup the logger
+	 *
+	 * @return {[type]} [description]
+	 */
+	ENV.buildLogger = function() {
+		global.DatatableJs.console = {};
+		for (var a in ENV.console_levels) if (ENV.console_levels.hasOwnProperty(a)) {
+			/*jshint loopfunc:true */
+			if (ENV.console_levels[a] >= ENV.log_levels.indexOf(this.getLogLevel())) {
+				global.DatatableJs.console[a] = function() {
+					return ENV.console[a].apply(ENV.console, arguments);
+				};
+			} else {
+				global.DatatableJs.console[a] = function() {};
+			}
+			/*jshint loopfunc:false */
+		}
+		return global.DatatableJs.console;
+	}
+
+	/**
 	 * DatatableJs constructor
 	 *
 	 * @param {Array} schema Optional, an array of column definitions
@@ -24,25 +143,6 @@
 
 		this.init(args);
 	};
-
-	// This library uses console messages to provide non-fatal error feedback, make
-	// sure those methods exist in all environments.
-	DatatableJs.console = global.console;
-	if (!DatatableJs.console)                {DatatableJs.console = {};}
-	if (!DatatableJs.console.assert)         {DatatableJs.console.assert         = function() {};}
-	if (!DatatableJs.console.count)          {DatatableJs.console.count          = function() {};}
-	if (!DatatableJs.console.dir)            {DatatableJs.console.dir            = function() {};}
-	if (!DatatableJs.console.error)          {DatatableJs.console.error          = function() {};}
-	if (!DatatableJs.console.group)          {DatatableJs.console.group          = function() {};}
-	if (!DatatableJs.console.groupCollapsed) {DatatableJs.console.groupCollapsed = function() {};}
-	if (!DatatableJs.console.groupEnd)       {DatatableJs.console.groupEnd       = function() {};}
-	if (!DatatableJs.console.info)           {DatatableJs.console.info           = function() {};}
-	if (!DatatableJs.console.log)            {DatatableJs.console.log            = function() {};}
-	if (!DatatableJs.console.time)           {DatatableJs.console.time           = function() {};}
-	if (!DatatableJs.console.timeEnd)        {DatatableJs.console.timeEnd        = function() {};}
-	if (!DatatableJs.console.trace)          {DatatableJs.console.trace          = function() {};}
-	if (!DatatableJs.console.warn)           {DatatableJs.console.warn           = function() {};}
-
 
 	/**
 	 * Store class references so they can be created and validated on demand
@@ -72,10 +172,13 @@
 	 * @return {DatatableJs}
 	 */
 	DatatableJs.prototype.init = function(args) {
+		// Store
 		if (args) {
-			if (undefined !== args.schema) {this.setSchema(args.schema);}
-			if (undefined !== args.data)   {this.setData(args.data);}
+			if (undefined !== args.schema)    {this.setSchema(args.schema);}
+			if (undefined !== args.data)      {this.setData(args.data);}
+			if (undefined !== args.log_level) {this.setLogLevel(args.log_level);}
 		}
+
 		return this;
 	};
 
@@ -130,6 +233,28 @@
 			}
 			this._data = data;
 		}
+		return this;
+	};
+
+	/**
+	 * Get the logging level
+	 *
+	 * Default to 'info'
+	 *
+	 * @return {Number}
+	 */
+	DatatableJs.prototype.getLogLevel = function() {
+		return ENV.getLogLevel();
+	};
+
+	/**
+	 * Set the current DatatableJs.lib.Data instance
+	 *
+	 * @param  {String}      log_level
+	 * @return {DatatableJs}
+	 */
+	DatatableJs.prototype.setLogLevel = function(log_level) {
+		ENV.setLogLevel(log_level);
 		return this;
 	};
 
@@ -269,5 +394,6 @@
 	};
 
 	global.DatatableJs = DatatableJs;
+	ENV.buildLogger();
 
 }(this);

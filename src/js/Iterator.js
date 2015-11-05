@@ -723,6 +723,10 @@
 
 	/**
 	 * Download the data as a CSV or Tab-delimited text file
+	 * A schema is required for exports in order to ensure proper column order.
+	 * Also, in order to support automatic parsing of the data by Excel, for CSV
+	 * exports commas in a data column are replaced with a semi-colon and tab
+	 * characters are replaced with the string '\t'.
 	 * @param  {String}   as       The file export format, accepts 'tdt', 'tsv' and
 	 *                             'txt' for tab-delmited and 'csv' for comma-separated.
 	 *                             This is also the default file extension.
@@ -743,6 +747,11 @@
 		var file_url;
 		var file_link;
 		var mime_type;
+
+		var columns = this.datatable_instance.getSchema().getColumns();
+		if (!Object.keys(columns).length) {
+			throw new global.DatatableJs.lib.Exception('A data schema is required for exports');
+		}
 
 		if (!filename) {
 			filename = 'export';
@@ -766,25 +775,31 @@
 			break;
 		}
 
-		for (a in data_rows[0]) if (data_rows[0].hasOwnProperty(a)) {
+		for (a in columns) if (columns.hasOwnProperty(a)) {
 			row.push(a);
 		}
 		data.push(row);
 
 		for (a = 0; a < data_rows.length; a++) {
 			row = [];
-			for (b in data_rows[a]) if (data_rows[a].hasOwnProperty(b)) {
-
+			for (b in columns) if (columns.hasOwnProperty(b)) {
 				if (data_rows[a][b] instanceof Array) {
 					cell_data = data_rows[a][b].join(',');
 
-				} else if (Object === data_rows[a][b].prototype) {
+				} else if (data_rows[a][b] && data_rows[a][b].prototype && Object === data_rows[a][b].prototype) {
 					cell_data = global.JSON.stringify(data_rows[a][b]);
 
 				} else {
 					cell_data = data_rows[a][b];
 				}
 
+				if (cell_data) {
+					if ('csv' === as) {
+						cell_data = cell_data.replace(/,/g, ';');
+					} else {
+						cell_data = cell_data.replace(/\t/g, '\t');
+					}
+				}
 				row.push(cell_data);
 			}
 			data.push(row);

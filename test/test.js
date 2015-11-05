@@ -17,6 +17,44 @@
 	});
 
 ////////////////////////////////////////////////////////////////////////
+// Log Levels
+////////////////////////////////////////////////////////////////////////
+
+	module('Architecture: Log Levels');
+
+	test('Default log level is \'info\'', function() {
+		var datatable = new global.DatatableJs();
+		ok('info' === datatable.getLogLevel(), 'The default log level is set to \'info\'');
+	});
+
+	test('Log level can be changed', function() {
+		var datatable = new global.DatatableJs();
+
+		datatable.setLogLevel('trace');
+		ok('trace' === datatable.getLogLevel(), 'The log level could not be changed to \'trace\'');
+
+		datatable.setLogLevel('info');
+		ok('info' === datatable.getLogLevel(), 'The log level could not be changed to \'info\'');
+	});
+
+	test('Invalid log levels are rejected', function() {
+		throws(
+			function() {
+				var datatable = new global.DatatableJs();
+				datatable.setLogLevel('invalid log level');
+			}
+			, global.DatatableJs.lib.Exception
+			, 'Invalid log level rejected'
+		);
+	});
+
+	test('Low log levels are suppressed', function() {
+		var datatable = new global.DatatableJs();
+		datatable.setLogLevel('info');
+		ok(function() {}.toString() == global.DatatableJs.console.trace.toString());
+	});
+
+////////////////////////////////////////////////////////////////////////
 // Column API
 ////////////////////////////////////////////////////////////////////////
 
