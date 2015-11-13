@@ -1,0 +1,14 @@
+src:
+    js:
+        - 'src/js/DatatableJs.js'
+        - 'src/js/Exception.js'
+        - 'src/js/Schema.js'
+        - 'src/js/Column.js'
+        - 'src/js/Data.js'
+        - 'src/js/Iterator.js'
+path:
+    src:
+        js: 'src/js'
+    dist:
+        js: 'assets/js'
+        basename: 'DatatableJs'

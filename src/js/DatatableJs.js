@@ -190,7 +190,7 @@
 	 * @return {DatatableJs}
 	 */
 	DatatableJs.prototype.clone = function() {
-		var data_copy = JSON.parse(JSON.stringify(this.getRows()));
+		var data_copy = global.JSON.parse(global.JSON.stringify(this.getRows()));
 		return new DatatableJs({
 			  data: data_copy
 			, schema: this.getSchema()

@@ -825,7 +825,11 @@
 
 		file_link.href = file_url;
 		file_link.setAttribute('download', filename+'.'+as);
+
+		// Append link because FireFox...
+		document.body.appendChild(file_link);
 		file_link.click();
+		document.body.removeChild(file_link);
 
 		return self;
 	}
