@@ -11,7 +11,7 @@
 		  enabled:       false
 		, rows_per_page: 25
 		, current_page:  1
-	}
+	};
 
 	/**
 	 * Iterator constructor
@@ -126,7 +126,7 @@
 		 *                                            pre-comparison transformations
 		 *     }
 		 */
-		this._sorts = []
+		this._sorts = [];
 	};
 
 	/**
@@ -354,7 +354,7 @@
 	 */
 	Iterator.prototype.getPage = function() {
 		return Number(this._pagination.current_page);
-	}
+	};
 
 	/**
 	 * Set the current page value
@@ -366,7 +366,7 @@
 		if (!page) {throw new global.DatatableJs.lib.Exception('Invalid page number "'+page+'"');}
 		this._pagination.current_page = Math.round(Number(page));
 		return this;
-	}
+	};
 
 	/**
 	 * Get the current number of rows per page
@@ -375,7 +375,7 @@
 	 */
 	Iterator.prototype.getRowsPerPage = function() {
 		return this._pagination.rows_per_page;
-	}
+	};
 
 	/**
 	 * Set the numer of rows per page
@@ -390,7 +390,7 @@
 		this._pagination.rows_per_page = Math.round(Number(rows));
 		this._pagination.current_page = 1;
 		return this;
-	}
+	};
 
 	/**
 	 * Get the current enablement flag for pagination limiters
@@ -399,7 +399,7 @@
 	 */
 	Iterator.prototype.getPaginationEnabled = function() {
 		return (this._pagination.enabled === true);
-	}
+	};
 
 	/**
 	 * Enable or disable pagination limiters
@@ -409,7 +409,7 @@
 	Iterator.prototype.setPaginationEnabled = function(enabled) {
 		this._pagination.enabled = (true === enabled);
 		return this;
-	}
+	};
 
 	/**
 	 * "execute" an iterator
@@ -494,7 +494,7 @@
 			this._is_sorted = true;
 		}
 		return this;
-	}
+	};
 
 	Iterator.prototype.sort = function() {
 		if (!this._is_sorted) {
@@ -504,7 +504,7 @@
 			this.shadow_instance.getData().sort();
 		}
 		return this;
-	}
+	};
 
 	Iterator.prototype.getMinRow = function() {
 		var min_page_row = 0;
@@ -512,7 +512,7 @@
 			min_page_row = (this._pagination.current_page * this._pagination.rows_per_page) - this._pagination.rows_per_page;
 		}
 		return min_page_row;
-	}
+	};
 
 	Iterator.prototype.getMaxRow = function() {
 		var max_page_row = this.getRows().length;
@@ -520,7 +520,7 @@
 			max_page_row = (this._pagination.current_page * this._pagination.rows_per_page) - 1;
 		}
 		return max_page_row;
-	}
+	};
 
 	/**
 	 * Return the next matching row of data and increment the iterator accordingly
@@ -599,7 +599,7 @@
 		this._iterator_value = this.getRows()[this._iterator_key];
 		this._cur_value      = this.getRows()[this._iterator_key];
 		return this;
-	}
+	};
 
 	/**
 	 * Test to see if a row matches this filter definition
@@ -685,7 +685,7 @@
 			.clearSortRules()
 			.execute();
 		this._is_executed = false;
-	}
+	};
 
 	Iterator.prototype.where = function(fields, comparators, values) {
 		return this.addFilterRule({
@@ -706,7 +706,7 @@
 			, comparator: comparator
 			, transformer: transformer
 		});
-	}
+	};
 
 	/**
 	 * Define the length property for the Iterator object
@@ -717,7 +717,7 @@
 		}
 		, get: function() {
 			this.applyFilterRules();
-			return this.shadow_instance.getRows().length
+			return this.shadow_instance.getRows().length;
 		}
 	});
 
@@ -832,7 +832,7 @@
 		document.body.removeChild(file_link);
 
 		return self;
-	}
+	};
 
 	global.DatatableJs.lib.Iterator = Iterator;
 

@@ -17,7 +17,7 @@
 		this._columns = {};
 
 		this.init(columns);
-	}
+	};
 
 	/**
 	 * Initialize
@@ -29,7 +29,7 @@
 			this.setColumns(columns);
 		}
 		return this;
-	}
+	};
 
 	/**
 	 * Get current column definitions
@@ -38,7 +38,7 @@
 	 */
 	Schema.prototype.getColumns = function() {
 		return this._columns;
-	}
+	};
 
 	/**
 	 * Set or extend current column definitions
@@ -65,7 +65,7 @@
 		}}
 
 		return this;
-	}
+	};
 
 	/**
 	 * Get a column definition by name
@@ -76,7 +76,7 @@
 	Schema.prototype.getColumn = function(column_name) {
 		if (undefined !== this._columns[column_name] && !(this._columns[column_name] instanceof global.DatatableJs.lib.Column)) {throw new global.DatatableJs.lib.Exception('The column "'+column_name+'" has an invalid definition');}
 		return this._columns[column_name];
-	}
+	};
 
 	/**
 	 * Delete a column definition by name
@@ -89,7 +89,7 @@
 			delete this._columns[column_name];
 		}
 		return this;
-	}
+	};
 
 	/**
 	 * Update or add a named column definition
@@ -102,7 +102,7 @@
 
 		// Validate
 		if (!column_name)                    {throw new global.DatatableJs.lib.Exception('Invalid column name: "'+column_name+'"');}
-		if ('string' !== typeof column_name) {throw new global.DatatableJs.lib.Exception('The column name must be a string')}
+		if ('string' !== typeof column_name) {throw new global.DatatableJs.lib.Exception('The column name must be a string');}
 		if (!(column_definition instanceof global.DatatableJs.lib.Column)) {
 			column_definition = new global.DatatableJs.lib.Column(column_definition);
 		}
@@ -111,7 +111,7 @@
 		this._columns[column_name] = column_definition;
 
 		return this;
-	}
+	};
 
 	/**
 	 * Test a row of data to see if it meets requirements for this schema definition
@@ -132,7 +132,7 @@
 		}}
 
 		return ret_val;
-	}
+	};
 
 	/**
 	 * Test an individual piece of data to see if meets requirements for a specified
@@ -187,7 +187,7 @@
 				ret_val = 'NaN';
 			}
 			return ret_val;
-		}
+		};
 
 		var ret_val = true;
 		var column = this.getColumn(col);
@@ -258,7 +258,7 @@
 			//);
 		*/
 		return ret_val;
-	}
+	};
 
 	global.DatatableJs.lib.Schema = Schema;
 

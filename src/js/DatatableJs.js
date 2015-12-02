@@ -119,7 +119,7 @@
 			/*jshint loopfunc:false */
 		}
 		return global.DatatableJs.console;
-	}
+	};
 
 	/**
 	 * DatatableJs constructor
@@ -296,7 +296,7 @@
             }
 		}
 		return iterator.next();
-	}
+	};
 
 	/**
 	 * Replace the current data set with an array of data rows

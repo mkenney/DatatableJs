@@ -232,8 +232,8 @@
 				comparator = function(a, b) {
 					var ret_val;
 
-					if (undefined === a || null === a) {ret_val = -1}
-					else if (undefined === b || null === b) {ret_val = 1}
+					if (undefined === a || null === a) {ret_val = -1;}
+					else if (undefined === b || null === b) {ret_val = 1;}
 					else if (a < b) {ret_val = -1;}
 					else if (a > b) {ret_val = 1;}
 					else {ret_val = 0;}
@@ -320,7 +320,7 @@
 		}
 
 		return this;
-	}
+	};
 
 	// Update row position tracking for future sorts to allow multi-column
 	// sorting
@@ -329,7 +329,7 @@
 			this._rows[a].__pos__ = a;
 		}
 		return this;
-	}
+	};
 
 	/**
 	 * Empty the data set
@@ -341,7 +341,7 @@
 		this._current_sort_direction = undefined;
 		this._rows = [];
 		return this;
-	}
+	};
 
 	/**
 	 * Define the length property for the Iterator object

@@ -1,5 +1,5 @@
 {
-	  "disallowKeywords": ["with"]
+	"disallowKeywords": ["with"]
 	, "disallowMixedSpacesAndTabs": "smart"
 	, "disallowMultipleLineStrings": true
 	, "disallowMultipleVarDecl": true
