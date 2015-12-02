@@ -795,9 +795,9 @@
 
 				if (cell_data) {
 					if ('csv' === as) {
-						cell_data = cell_data.replace(/,/g, ';');
+						cell_data = String(cell_data).replace(/,/g, ';');
 					} else {
-						cell_data = cell_data.replace(/\t/g, '\t');
+						cell_data = String(cell_data).replace(/\t/g, '\t');
 					}
 				}
 				row.push(cell_data);
