@@ -15,6 +15,14 @@ var gulp = require('gulp');
 var _conf_ = yamlReader.sync('gulpfile.yml');
 var _pkg_ = JSON.parse(fs.readFileSync('./package.json'));
 
+//
+var banner = [
+    '/*!'
+    , ' * DatatableJs v'+_pkg_.version+' ('+_pkg_.homepage+')'
+    , ' * Copyright 2014-'+new Date().getFullYear()+' '+_pkg_.author
+    , ' * Licensed under '+_pkg_.license.type+' ('+_pkg_.license.url+')'
+    , ' */\n'
+].join('\n');
 
 ////////////////////////////////////////////////////////////////////////////////
 // Primary tasks
@@ -99,11 +107,14 @@ gulp.task('concat-js', ['test-js', 'codestyle-js', 'lint-js'], function() {
 gulp.task('min-js', ['concat-js'], function() {
     var rename = require("gulp-rename");
     var uglify = require('gulp-uglify');
+    var header = require('gulp-header');
     var sourcemaps = require('gulp-sourcemaps');
+
     return gulp.src('./'+_conf_.path.dist.js+'/'+_pkg_.version+'/'+_conf_.path.dist.basename+'.js')
         .pipe(rename(_conf_.path.dist.basename+'.min.js'))
         .pipe(sourcemaps.init())
         .pipe(uglify())
+        .pipe(header(banner))
         .pipe(sourcemaps.write('./'))
         .pipe(gulp.dest('./'+_conf_.path.dist.js+'/'+_pkg_.version))
         .on('error', function(e) {
