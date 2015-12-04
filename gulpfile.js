@@ -74,8 +74,18 @@ gulp.task('lint-js', function() {
         });
 });
 
+// Unit Tests
+gulp.task('test-js', function() {
+    var qunit = require("gulp-qunit");
+    return gulp.src(_conf_.path.test+'/source.html')
+        .pipe(qunit())
+        .on('error', function(e) {
+            console.error(e.toString()+"\n");
+        });
+});
+
 // Build JS file
-gulp.task('concat-js', ['codestyle-js', 'lint-js'], function() {
+gulp.task('concat-js', ['test-js', 'codestyle-js', 'lint-js'], function() {
     var concat = require('gulp-concat');
     return gulp.src(_conf_.src.js)
         .pipe(concat(_conf_.path.dist.basename+'.js'))
