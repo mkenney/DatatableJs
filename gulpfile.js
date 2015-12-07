@@ -21,7 +21,8 @@ var banner = [
     , ' * DatatableJs v'+_pkg_.version+' ('+_pkg_.homepage+')'
     , ' * Copyright 2014-'+new Date().getFullYear()+' '+_pkg_.author
     , ' * Licensed under '+_pkg_.license.type+' ('+_pkg_.license.url+')'
-    , ' */\n'
+    , ' */'
+    , ''
 ].join('\n');
 
 ////////////////////////////////////////////////////////////////////////////////
