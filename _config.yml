@@ -1,0 +1,8 @@
+title: Datatablejs
+description: A library for manipulating and filtering tabular data
+google_analytics: 
+show_downloads: true
+theme: jekyll-theme-slate
+
+gems:
+  - jekyll-mentions
